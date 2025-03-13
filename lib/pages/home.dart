@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key, this.videoId});
@@ -14,15 +15,44 @@ class Home extends StatefulWidget {
 }
 
 class _HomePageState extends State<Home> {
+  YoutubePlayerController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = YoutubePlayerController(
+    initialVideoId: 'juKd26qkNAw',
+    flags: const YoutubePlayerFlags(
+      hideControls: false,
+      useHybridComposition: false,
+      disableDragSeek: true,
+
+      hideThumbnail: true,
+      autoPlay: true,
+      // mute: true,
+      loop: false,
+    ),
+  );
+  }
  
   @override
   Widget build(BuildContext context) {
+    if (_controller == null) return Center(child: CircularProgressIndicator());
     return Scaffold(
       // appBar: AppBar(title: const Text('Youtube Player IFrame Demo')),
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-        
+          Stack(
+            alignment: Alignment.topLeft,
+            children: [
+              SizedBox(
+                width: 600,
+                height: 400,
+                child:
+                YoutubePlayer(controller: _controller!),              ),
+            ],
+              ),
         ],
       ),
     );
@@ -30,6 +60,7 @@ class _HomePageState extends State<Home> {
 
   @override
   void dispose() {
-\    super.dispose();
+    _controller.dispose();
+    super.dispose();
   }
 }
