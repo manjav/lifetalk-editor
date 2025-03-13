@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lifetalk_editor/widgets/inspector.dart';
 import 'package:lifetalk_editor/widgets/trimmer.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -22,20 +23,20 @@ class _HomePageState extends State<Home> {
   void initState() {
     super.initState();
     _controller = YoutubePlayerController(
-    initialVideoId: 'juKd26qkNAw',
-    flags: const YoutubePlayerFlags(
-      hideControls: false,
-      useHybridComposition: false,
-      disableDragSeek: true,
+      initialVideoId: 'juKd26qkNAw',
+      flags: const YoutubePlayerFlags(
+        hideControls: false,
+        useHybridComposition: false,
+        disableDragSeek: true,
 
-      hideThumbnail: true,
-      autoPlay: true,
-      // mute: true,
-      loop: false,
-    ),
-  );
+        hideThumbnail: true,
+        autoPlay: true,
+        // mute: true,
+        loop: false,
+      ),
+    );
   }
- 
+
   @override
   Widget build(BuildContext context) {
     if (_controller == null) return Center(child: CircularProgressIndicator());
@@ -61,7 +62,7 @@ class _HomePageState extends State<Home> {
               ),
               Trimmer(_controller!),
             ],
-              ),
+          ),
         ],
       ),
     );
