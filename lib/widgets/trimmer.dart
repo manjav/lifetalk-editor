@@ -19,6 +19,7 @@ class _TrimmerState extends State<Trimmer> {
 
   int _scale = 1;
   double _timelineSize = 1;
+  final _scrollController = ScrollController();
   SfRangeValues _values = SfRangeValues(0, 20);
 
   @override
@@ -41,67 +42,81 @@ class _TrimmerState extends State<Trimmer> {
         final position = value.position.inMilliseconds;
         final duration = widget.controller.metadata.duration.inMilliseconds;
         return Stack(
-          alignment: Alignment.bottomCenter,
+          alignment: Alignment.topRight,
           children: [
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.topLeft,
-                  colors: <Color>[Colors.white24, Colors.black38],
-                ),
-              ),
-              height: 80,
+            Scrollbar(
+              controller: _scrollController,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topRight,
+                          end: Alignment.topLeft,
+                          colors: <Color>[Colors.white24, Colors.black38],
+                        ),
+                      ),
+                      height: 80,
                       width: _timelineSize,
-            ),
-            Positioned(
-              left: 24,
-              right: 24,
-              bottom: 23,
-              child: LinearProgressIndicator(
-                value: duration == 0 ? 0 : position / duration,
-                minHeight: 1,
-              ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              child: StatefulBuilder(
-                builder: (context, setState) {
-                  return SfRangeSliderTheme(
-                    data: SfRangeSliderThemeData(
-                      thumbRadius: 4,
-                      overlappingThumbStrokeColor: Colors.red,
                     ),
-                    child: SfRangeSlider(
-                      dragMode: SliderDragMode.both,
-                      showTicks: true,
-                      min: 0,
-                      max: duration == 0 ? 60 : duration.toDouble(),
-                      values: _values,
-                      enableTooltip: true,
-                      tooltipTextFormatterCallback: (
-                        actualValue,
-                        formattedText,
-                      ) {
-                        return (actualValue as double).toTime();
-                      },
-                      trackShape: _TrackShape(),
-                      onChangeEnd: (value) {
-                        print(value);
-                        widget.controller.seekTo(
-                          Duration(
+                    Positioned(
+                      left: 24,
+                      right: 24,
+                      bottom: 23,
+                      child: LinearProgressIndicator(
+                        value: duration == 0 ? 0 : position / duration,
+                        minHeight: 1,
+                      ),
+                    ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      child: StatefulBuilder(
+                        builder: (context, setState) {
+                          return SfRangeSliderTheme(
+                            data: SfRangeSliderThemeData(
+                              thumbRadius: 4,
+                              overlappingThumbStrokeColor: Colors.red,
+                            ),
+                            child: SfRangeSlider(
+                              dragMode: SliderDragMode.both,
+                              showTicks: true,
+                              min: 0,
+                              max: duration == 0 ? 60 : duration.toDouble(),
+                              values: _values,
+                              enableTooltip: true,
+                              tooltipTextFormatterCallback: (
+                                actualValue,
+                                formattedText,
+                              ) {
+                                return (actualValue as double).toTime();
+                              },
+                              trackShape: _TrackShape(),
+                              onChangeEnd: (value) {
+                                print(value);
+                                widget.controller.seekTo(
+                                  Duration(
                                     milliseconds:
                                         (_values.start as double).round(),
-                          ),
-                        );
-                      },
-                      onChanged: (SfRangeValues newValues) {
-                        setState(() => _values = newValues);
-                      },
+                                  ),
+                                );
+                              },
+                              onChanged: (SfRangeValues newValues) {
+                                setState(() => _values = newValues);
+                              },
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  );
-                },
+                  ],
+                ),
+              ),
+            ),
             CartStepperInt(
               value: _scale,
               didChangeCount:
@@ -114,6 +129,16 @@ class _TrimmerState extends State<Trimmer> {
                     );
                     _scale = count.min(1);
                   }),
+            ),
+            Positioned(
+              right: 120,
+              child: ElevatedButton(
+                onPressed: () {
+                  widget.controller.seekTo(
+                    Duration(milliseconds: (_values.start as double).round()),
+                  );
+                },
+                child: Icon(Icons.replay),
               ),
             ),
           ],
