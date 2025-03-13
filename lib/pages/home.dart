@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lifetalk_editor/widgets/trimmer.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class Home extends StatefulWidget {
@@ -51,6 +52,7 @@ class _HomePageState extends State<Home> {
                 height: 400,
                 child:
                 YoutubePlayer(controller: _controller!),              ),
+              Trimmer(_controller!),
             ],
               ),
         ],
@@ -60,7 +62,7 @@ class _HomePageState extends State<Home> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 }
