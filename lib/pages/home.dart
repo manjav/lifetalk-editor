@@ -52,6 +52,13 @@ class _HomePageState extends State<Home> {
                 height: 400,
                 child:
                 YoutubePlayer(controller: _controller!),              ),
+              SizedBox(width: MediaQuery.of(context).size.width),
+              Positioned(
+                top: 76,
+                right: 0,
+                left: 600,
+                child: Inspector(_controller!),
+              ),
               Trimmer(_controller!),
             ],
               ),
