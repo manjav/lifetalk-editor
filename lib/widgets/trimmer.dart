@@ -1,8 +1,10 @@
+import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:lifetalk_editor/utils/extension.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'dart:math' as math;
 
 class Trimmer extends StatefulWidget {
   final YoutubePlayerController controller;
@@ -14,8 +16,16 @@ class Trimmer extends StatefulWidget {
 }
 
 class _TrimmerState extends State<Trimmer> {
+
+  int _scale = 1;
+  double _timelineSize = 1;
   SfRangeValues _values = SfRangeValues(0, 20);
 
+  @override
+  void initState() {
+    _calculateTimelineSize();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +52,7 @@ class _TrimmerState extends State<Trimmer> {
                 ),
               ),
               height: 80,
-              width: MediaQuery.of(context).size.width,
+                      width: _timelineSize,
             ),
             Positioned(
               left: 24,
@@ -81,7 +91,8 @@ class _TrimmerState extends State<Trimmer> {
                         print(value);
                         widget.controller.seekTo(
                           Duration(
-                            milliseconds: (_values.start as double).round(),
+                                    milliseconds:
+                                        (_values.start as double).round(),
                           ),
                         );
                       },
@@ -91,6 +102,18 @@ class _TrimmerState extends State<Trimmer> {
                     ),
                   );
                 },
+            CartStepperInt(
+              value: _scale,
+              didChangeCount:
+                  (count) => setState(() {
+                    var size = _timelineSize + 0;
+                    _calculateTimelineSize();
+                    _scrollController.jumpTo(
+                      _scrollController.position.pixels *
+                          (_timelineSize / size),
+                    );
+                    _scale = count.min(1);
+                  }),
               ),
             ),
           ],
@@ -98,7 +121,12 @@ class _TrimmerState extends State<Trimmer> {
       },
     );
   }
+
+  void _calculateTimelineSize() {
+    _timelineSize = MediaQuery.of(context).size.width * math.pow(2, _scale - 1);
+  }
 }
+
 class _TrackShape extends SfTrackShape {
   void paint(
     PaintingContext context,
