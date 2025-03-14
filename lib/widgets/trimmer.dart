@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:lifetalk_editor/utils/extension.dart';
@@ -16,16 +18,15 @@ class Trimmer extends StatefulWidget {
 }
 
 class _TrimmerState extends State<Trimmer> {
-
   int _scale = 1;
   double _timelineSize = 1;
   final _scrollController = ScrollController();
   SfRangeValues _values = SfRangeValues(0, 20);
 
   @override
-  void initState() {
+  void didChangeDependencies() {
     _calculateTimelineSize();
-    super.initState();
+    super.didChangeDependencies();
   }
 
   @override
@@ -97,7 +98,6 @@ class _TrimmerState extends State<Trimmer> {
                               },
                               trackShape: _TrackShape(),
                               onChangeEnd: (value) {
-                                print(value);
                                 widget.controller.seekTo(
                                   Duration(
                                     milliseconds:
