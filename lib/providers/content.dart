@@ -30,4 +30,31 @@ enum ContentLevel {
     final values = ContentLevel.values;
     return index <= 1 ? null : values[index - 1];
   }
+
+  Map<String, Type> get elemets {
+    return switch (this) {
+      ContentLevel.category => {
+        "title": String,
+        "subtitle": String,
+        "iconUrl": String,
+      },
+      ContentLevel.lesson => {
+        "mode": LessonMode,
+        "title": String,
+        "subtitle": String,
+        "iconUrl": String,
+      },
+      ContentLevel.serie => {"videoUrl": String},
+      ContentLevel.end => {
+        "type": ContentType,
+        "value": String,
+        "media": String,
+      },
+      _ => {},
+    };
+  }
 }
+
+enum LessonMode { imitation }
+
+enum ContentType { caption, repeat, wordBank }

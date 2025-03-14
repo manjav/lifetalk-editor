@@ -2,16 +2,16 @@ import 'dart:math' as math;
 
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/material.dart';
+import 'package:lifetalk_editor/providers/content.dart';
 import 'package:lifetalk_editor/utils/extension.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'dart:math' as math;
 
 class Trimmer extends StatefulWidget {
   final YoutubePlayerController controller;
-
-  const Trimmer(this.controller, {super.key});
+  final ValueNotifier<Content?> selectedContent;
+  const Trimmer(this.controller, this.selectedContent, {super.key});
 
   @override
   State<Trimmer> createState() => _TrimmerState();
@@ -104,6 +104,11 @@ class _TrimmerState extends State<Trimmer> {
                                         (_values.start as double).round(),
                                   ),
                                 );
+                                var content =
+                                    widget.selectedContent.value!.clone();
+                                content.values["media"] =
+                                    "${(value.start as double).toTime()}-${(value.end as double).toTime()}";
+                                widget.selectedContent.value = content;
                               },
                               onChanged: (SfRangeValues newValues) {
                                 setState(() => _values = newValues);

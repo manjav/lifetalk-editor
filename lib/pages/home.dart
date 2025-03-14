@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lifetalk_editor/providers/content.dart';
 import 'package:lifetalk_editor/widgets/inspector.dart';
+import 'package:lifetalk_editor/widgets/tree.dart';
 import 'package:lifetalk_editor/widgets/trimmer.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -18,6 +20,7 @@ class Home extends StatefulWidget {
 
 class _HomePageState extends State<Home> {
   YoutubePlayerController? _controller;
+  ValueNotifier<Content?> _selectedContent = ValueNotifier(null);
 
   @override
   void initState() {
@@ -40,6 +43,7 @@ class _HomePageState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     if (_controller == null) return Center(child: CircularProgressIndicator());
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       // appBar: AppBar(title: const Text('Youtube Player IFrame Demo')),
       body: Column(
@@ -48,23 +52,25 @@ class _HomePageState extends State<Home> {
           Stack(
             alignment: Alignment.topLeft,
             children: [
+              SizedBox(width: size.width, height: size.height),
               SizedBox(
                 width: 600,
                 height: 400,
-                child:
-                YoutubePlayer(controller: _controller!),              ),
+                child: YoutubePlayer(controller: _controller!),
+              ),
               SizedBox(width: MediaQuery.of(context).size.width),
               Positioned(
                 top: 76,
                 right: 0,
                 left: 600,
-                child: Inspector(_controller!),
+                child: Inspector(_controller!, _selectedContent),
               ),
+              Trimmer(_controller!, _selectedContent),
               Positioned(
                 top: 400,
                 width: 600,
                 bottom: 0,
-                child: TreeWidget(),
+                child: TreeWidget(_selectedContent),
               ),
             ],
           ),

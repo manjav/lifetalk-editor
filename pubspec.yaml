@@ -17,6 +17,7 @@ dependencies:
   syncfusion_flutter_sliders: ^28.2.11
   youtube_player_flutter: ^9.1.1
   flutter_fancy_tree_view: ^1.6.0
+  intry: ^0.3.2
 
 dev_dependencies:
   flutter_test:
