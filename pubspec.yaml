@@ -16,6 +16,7 @@ dependencies:
   go_router: ^14.6.0
   syncfusion_flutter_sliders: ^28.2.11
   youtube_player_flutter: ^9.1.1
+  flutter_fancy_tree_view: ^1.6.0
 
 dev_dependencies:
   flutter_test:

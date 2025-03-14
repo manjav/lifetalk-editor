@@ -60,7 +60,12 @@ class _HomePageState extends State<Home> {
                 left: 600,
                 child: Inspector(_controller!),
               ),
-              Trimmer(_controller!),
+              Positioned(
+                top: 400,
+                width: 600,
+                bottom: 0,
+                child: TreeWidget(),
+              ),
             ],
           ),
         ],
