@@ -3,16 +3,16 @@ import 'package:intry/intry.dart';
 import 'package:lifetalk_editor/providers/content.dart';
 import 'package:youtube_player_flutter/src/utils/youtube_player_controller.dart';
 
-class Inspector extends StatefulWidget {
+class InspectorView extends StatefulWidget {
   final YoutubePlayerController controller;
   final ValueNotifier<Content?> selectedContent;
-  const Inspector(this.controller, this.selectedContent, {super.key});
+  const InspectorView(this.controller, this.selectedContent, {super.key});
 
   @override
-  State<Inspector> createState() => _InspectorState();
+  State<InspectorView> createState() => _InspectorViewState();
 }
 
-class _InspectorState extends State<Inspector> {
+class _InspectorViewState extends State<InspectorView> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(

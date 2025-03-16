@@ -8,16 +8,16 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-class Trimmer extends StatefulWidget {
+class TimelineView extends StatefulWidget {
   final YoutubePlayerController controller;
   final ValueNotifier<Content?> selectedContent;
-  const Trimmer(this.controller, this.selectedContent, {super.key});
+  const TimelineView(this.controller, this.selectedContent, {super.key});
 
   @override
-  State<Trimmer> createState() => _TrimmerState();
+  State<TimelineView> createState() => _TimelineViewState();
 }
 
-class _TrimmerState extends State<Trimmer> {
+class _TimelineViewState extends State<TimelineView> {
   int _scale = 1;
   double _timelineSize = 1;
   final _scrollController = ScrollController();

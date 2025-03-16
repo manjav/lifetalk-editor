@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:lifetalk_editor/providers/content.dart';
 
-class TreeWidget extends StatefulWidget {
+class HierarchyView extends StatefulWidget {
   final ValueNotifier<Content?> selectedContent;
-  const TreeWidget(this.selectedContent, {super.key});
+  const HierarchyView(this.selectedContent, {super.key});
 
   @override
-  State<TreeWidget> createState() => _TreeWidgetState();
+  State<HierarchyView> createState() => _HierarchyViewState();
 }
 
-class _TreeWidgetState extends State<TreeWidget> {
+class _HierarchyViewState extends State<HierarchyView> {
   List<Content> roots = [Content()];
   TreeController<Content>? _treeController;
 
@@ -72,6 +72,7 @@ class _TreeWidgetState extends State<TreeWidget> {
               }
               content.children?.add(Content(parent: content));
               _treeController!.rebuild();
+              _treeController!.expand(content);
             }),
             _nodeButton(Icons.delete, () {
               widget.selectedContent.value!.delete();

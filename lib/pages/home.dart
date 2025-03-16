@@ -4,9 +4,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:lifetalk_editor/providers/content.dart';
-import 'package:lifetalk_editor/widgets/inspector.dart';
-import 'package:lifetalk_editor/widgets/tree.dart';
-import 'package:lifetalk_editor/widgets/trimmer.dart';
+import 'package:lifetalk_editor/widgets/hierarchy_view.dart';
+import 'package:lifetalk_editor/widgets/inspector_view.dart';
+import 'package:lifetalk_editor/widgets/timeline_view.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class Home extends StatefulWidget {
@@ -63,14 +63,14 @@ class _HomePageState extends State<Home> {
                 top: 76,
                 right: 0,
                 left: 600,
-                child: Inspector(_controller!, _selectedContent),
+                child: InspectorView(_controller!, _selectedContent),
               ),
-              Trimmer(_controller!, _selectedContent),
+              TimelineView(_controller!, _selectedContent),
               Positioned(
                 top: 400,
                 width: 600,
                 bottom: 0,
-                child: TreeWidget(_selectedContent),
+                child: HierarchyView(_selectedContent),
               ),
             ],
           ),
