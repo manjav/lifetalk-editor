@@ -105,6 +105,10 @@ class _TimelineViewState extends State<TimelineView> {
                                         (_values.start as double).round(),
                                   ),
                                 );
+                                if (widget.selectedContent.value == null ||
+                                    widget.selectedContent.value!.level !=
+                                        ContentLevel.end)
+                                  return;
                                 var content =
                                     widget.selectedContent.value!.clone();
                                 content.values["media"] =
