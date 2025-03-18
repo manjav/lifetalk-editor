@@ -148,6 +148,16 @@ class _TimelineViewState extends State<TimelineView> {
                 child: Icon(Icons.replay),
               ),
             ),
+            Positioned(
+              right: 190,
+              child: ElevatedButton(
+                style: Themes.buttonStyle(),
+                onPressed: () {
+                  print(jsonEncode(widget.selectedContent.value));
+                },
+                child: Icon(Icons.download),
+              ),
+            ),
           ],
         );
       },

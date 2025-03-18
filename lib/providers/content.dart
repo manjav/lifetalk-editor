@@ -12,6 +12,23 @@ class Content {
   Content clone() {
     return Content(parent: parent, children: children)..values = values;
   }
+
+  Map toJson() {
+    var json = <String, dynamic>{};
+    if (children != null) {
+      json["children"] = children!.map((e) => e.toJson()).toList();
+    }
+    if (values.isNotEmpty) {
+      for (var entry in values.entries) {
+        if (entry.value is Enum) {
+          json[entry.key] = (entry.value as Enum).name;
+        } else {
+          json[entry.key] = entry.value;
+        }
+      }
+    }
+    return json;
+  }
 }
 
 enum ContentLevel {
