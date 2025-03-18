@@ -88,7 +88,10 @@ enum ContentLevel {
       ContentLevel.serie => {"videoUrl": String},
       ContentLevel.end => {
         "type": ContentType,
-        "value": String,
+        "en": String,
+        "es": String,
+        "pt": String,
+        "fa": String,
         "media": String,
       },
       _ => {},
