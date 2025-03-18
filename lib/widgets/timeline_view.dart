@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:cart_stepper/cart_stepper.dart';
@@ -20,6 +21,7 @@ class TimelineView extends StatefulWidget {
 
 class _TimelineViewState extends State<TimelineView> {
   int _scale = 1;
+  Content? _activeContent;
   double _timelineSize = 1;
   final _scrollController = ScrollController();
   SfRangeValues _values = SfRangeValues(0, 20);
@@ -32,6 +34,7 @@ class _TimelineViewState extends State<TimelineView> {
 
   @override
   Widget build(BuildContext context) {
+    _calculateSelecedRange();
     return ValueListenableBuilder(
       valueListenable: widget.controller,
       builder: (context, value, child) {
@@ -156,6 +159,26 @@ class _TimelineViewState extends State<TimelineView> {
         );
       },
     );
+  }
+
+  void _calculateSelecedRange() {
+    widget.selectedContent.addListener(() {
+      if (_activeContent != null &&
+          _activeContent!.id == widget.selectedContent.value!.id) {
+        return;
+      }
+      var content = widget.selectedContent.value;
+      if (content!.values.containsKey("media")) {
+        List<String> ranges = content.values["media"].split("-");
+        List<double> values = [];
+        for (var range in ranges) {
+          values.add(range.parseTime() * 1000);
+        }
+        _values = SfRangeValues(values[0], values[1]);
+        _play();
+        _activeContent = content;
+      }
+    });
   }
 
   void _calculateTimelineSize() {
