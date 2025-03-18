@@ -18,10 +18,14 @@ extension NumExtension on num {
   //   return "$hoursStr$mins$separator$secs$millisStr";
   // }
 
-  String toTime([String newPattern = "HH:mm:ss.S", String? locale]) {
-    return DateFormat(
+  String toTime([String newPattern = "H:m:s.SS", String? locale]) {
+    var pattern = DateFormat(
       newPattern,
     ).format(DateTime.utc(0, 0, 0, 0, 0, 0, 0, (this * 1000).toInt()));
+    if (pattern.startsWith("0:")) {
+      pattern = pattern.substring(2, pattern.length - 1);
+    }
+    return pattern;
   }
 }
 
