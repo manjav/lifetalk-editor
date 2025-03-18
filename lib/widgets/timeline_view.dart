@@ -25,6 +25,7 @@ class _TimelineViewState extends State<TimelineView> {
   double _timelineSize = 1;
   final _scrollController = ScrollController();
   SfRangeValues _values = SfRangeValues(0, 20);
+  bool _hasEndOfRangeChanged = false;
 
   @override
   void didChangeDependencies() {
@@ -81,39 +82,41 @@ class _TimelineViewState extends State<TimelineView> {
                       left: 0,
                       right: 0,
                       child: SfRangeSliderTheme(
-                            data: SfRangeSliderThemeData(
-                              thumbRadius: 4,
-                              overlappingThumbStrokeColor: Colors.red,
-                            ),
-                            child: SfRangeSlider(
-                              dragMode: SliderDragMode.both,
-                              showTicks: true,
-                              min: 0,
-                              max: duration == 0 ? 60 : duration.toDouble(),
-                              values: _values,
-                              enableTooltip: true,
-                              tooltipTextFormatterCallback: (
-                                actualValue,
-                                formattedText,
-                              ) {
-                                return (actualValue as double).toTime();
-                              },
-                              trackShape: _TrackShape(),
-                              onChangeEnd: (value) {
-                                _play();
-                                if (widget.selectedContent.value == null ||
-                                    widget.selectedContent.value!.level !=
-                                        ContentLevel.end)
-                                  return;
+                        data: SfRangeSliderThemeData(
+                          thumbRadius: 4,
+                          overlappingThumbStrokeColor: Colors.red,
+                        ),
+                        child: SfRangeSlider(
+                          dragMode: SliderDragMode.both,
+                          showTicks: true,
+                          min: 0,
+                          max: duration == 0 ? 60 : duration.toDouble(),
+                          values: _values,
+                          enableTooltip: true,
+                          tooltipTextFormatterCallback: (
+                            actualValue,
+                            formattedText,
+                          ) {
+                            return (actualValue as double).toTime();
+                          },
+                          trackShape: _TrackShape(),
+                          onChangeEnd: (value) {
+                            _play();
+                            if (widget.selectedContent.value == null ||
+                                widget.selectedContent.value!.level !=
+                                    ContentLevel.end)
+                              return;
                             var content = widget.selectedContent.value!.clone();
-                                content.values["media"] =
-                                    "${(value.start as double).toTime()}-${(value.end as double).toTime()}";
-                                widget.selectedContent.value = content;
-                              },
-                              onChanged: (SfRangeValues newValues) {
+                            content.values["media"] =
+                                "${(value.start as double).toTime()}-${(value.end as double).toTime()}";
+                            widget.selectedContent.value = content;
+                          },
+                          onChanged: (SfRangeValues newValues) {
+                            _hasEndOfRangeChanged =
+                                _values.start == newValues.start;
                             _values = newValues;
-                              },
-                            ),
+                          },
+                        ),
                       ),
                     ),
                   ],
@@ -184,10 +187,10 @@ class _TimelineViewState extends State<TimelineView> {
   void _calculateTimelineSize() {
     _timelineSize = MediaQuery.of(context).size.width * math.pow(2, _scale - 1);
   }
+
   void _play() {
-    widget.controller.seekTo(
-      Duration(milliseconds: (_values.start as double).round()),
-    );
+    var milis = _hasEndOfRangeChanged ? _values.end - 1000 : _values.start;
+    widget.controller.seekTo(Duration(milliseconds: (milis as double).round()));
   }
 }
 
