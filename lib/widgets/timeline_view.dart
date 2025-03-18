@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:lifetalk_editor/providers/content.dart';
+import 'package:lifetalk_editor/theme/theme.dart';
 import 'package:lifetalk_editor/utils/extension.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
@@ -138,6 +139,7 @@ class _TimelineViewState extends State<TimelineView> {
             Positioned(
               right: 120,
               child: ElevatedButton(
+                style: Themes.buttonStyle(),
                 onPressed: () {
                   widget.controller.seekTo(
                     Duration(milliseconds: (_values.start as double).round()),

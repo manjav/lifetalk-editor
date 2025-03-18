@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:lifetalk_editor/router.dart';
+import 'package:lifetalk_editor/theme/theme.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -31,15 +32,9 @@ class YoutubeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: Colors.green,
-      dynamicSchemeVariant: DynamicSchemeVariant.expressive,
-      brightness: Brightness.dark,
-    );
-
     return MaterialApp.router(
       title: 'Youtube Player IFrame Demo',
-      theme: ThemeData.from(colorScheme: colorScheme),
+      theme: customTheme,
       debugShowCheckedModeBanner: false,
       routerConfig: router,
     );
