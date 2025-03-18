@@ -7,6 +7,21 @@ class Content {
     level = parent?.level.childLevel ?? ContentLevel.lesson;
   }
 
+  /**
+   * Returns the index of this content in its parent
+   */
+  int get index => parent == null ? 0 : parent!.children!.indexOf(this);
+
+  /**
+   * Returns the id of this content
+   */
+  String get id {
+    if (parent == null) {
+      return "$index";
+    }
+    return "${parent!.id}_$index";
+  }
+
   void delete() => parent?.children?.remove(this);
 
   Content clone() {
