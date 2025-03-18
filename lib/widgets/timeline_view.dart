@@ -77,9 +77,7 @@ class _TimelineViewState extends State<TimelineView> {
                     Positioned(
                       left: 0,
                       right: 0,
-                      child: StatefulBuilder(
-                        builder: (context, setState) {
-                          return SfRangeSliderTheme(
+                      child: SfRangeSliderTheme(
                             data: SfRangeSliderThemeData(
                               thumbRadius: 4,
                               overlappingThumbStrokeColor: Colors.red,
@@ -99,28 +97,20 @@ class _TimelineViewState extends State<TimelineView> {
                               },
                               trackShape: _TrackShape(),
                               onChangeEnd: (value) {
-                                widget.controller.seekTo(
-                                  Duration(
-                                    milliseconds:
-                                        (_values.start as double).round(),
-                                  ),
-                                );
+                                _play();
                                 if (widget.selectedContent.value == null ||
                                     widget.selectedContent.value!.level !=
                                         ContentLevel.end)
                                   return;
-                                var content =
-                                    widget.selectedContent.value!.clone();
+                            var content = widget.selectedContent.value!.clone();
                                 content.values["media"] =
                                     "${(value.start as double).toTime()}-${(value.end as double).toTime()}";
                                 widget.selectedContent.value = content;
                               },
                               onChanged: (SfRangeValues newValues) {
-                                setState(() => _values = newValues);
+                            _values = newValues;
                               },
                             ),
-                          );
-                        },
                       ),
                     ),
                   ],
@@ -170,6 +160,11 @@ class _TimelineViewState extends State<TimelineView> {
 
   void _calculateTimelineSize() {
     _timelineSize = MediaQuery.of(context).size.width * math.pow(2, _scale - 1);
+  }
+  void _play() {
+    widget.controller.seekTo(
+      Duration(milliseconds: (_values.start as double).round()),
+    );
   }
 }
 
