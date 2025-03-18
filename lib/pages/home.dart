@@ -19,33 +19,31 @@ class Home extends StatefulWidget {
 }
 
 class _HomePageState extends State<Home> {
-  YoutubePlayerController? _controller;
+  YoutubePlayerController _controller = YoutubePlayerController(
+    initialVideoId: 'juKd26qkNAw',
+    flags: const YoutubePlayerFlags(
+      useHybridComposition: false,
+      disableDragSeek: true,
+      hideThumbnail: true,
+    ),
+  );
   ValueNotifier<Content?> _selectedContent = ValueNotifier(null);
 
   @override
   void initState() {
+    _selectedContent.addListener(() {
+      String video = _selectedContent.value!.values["videoUrl"] ?? "";
+      if (video.isNotEmpty && _controller.value.metaData.videoId != video) {
+        _controller.load(video);
+      }
+    });
     super.initState();
-    _controller = YoutubePlayerController(
-      initialVideoId: 'juKd26qkNAw',
-      flags: const YoutubePlayerFlags(
-        hideControls: false,
-        useHybridComposition: false,
-        disableDragSeek: true,
-
-        hideThumbnail: true,
-        autoPlay: true,
-        // mute: true,
-        loop: false,
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_controller == null) return Center(child: CircularProgressIndicator());
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      // appBar: AppBar(title: const Text('Youtube Player IFrame Demo')),
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -56,16 +54,16 @@ class _HomePageState extends State<Home> {
               SizedBox(
                 width: 600,
                 height: 400,
-                child: YoutubePlayer(controller: _controller!),
+                child: YoutubePlayer(controller: _controller),
               ),
               SizedBox(width: MediaQuery.of(context).size.width),
               Positioned(
                 top: 76,
                 right: 0,
                 left: 600,
-                child: InspectorView(_controller!, _selectedContent),
+                child: InspectorView(_controller, _selectedContent),
               ),
-              TimelineView(_controller!, _selectedContent),
+              TimelineView(_controller, _selectedContent),
               Positioned(
                 top: 400,
                 width: 600,
@@ -81,7 +79,7 @@ class _HomePageState extends State<Home> {
 
   @override
   void dispose() {
-    _controller?.dispose();
+    _controller.dispose();
     super.dispose();
   }
 }
