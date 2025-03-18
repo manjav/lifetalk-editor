@@ -81,42 +81,49 @@ class _TimelineViewState extends State<TimelineView> {
                     Positioned(
                       left: 0,
                       right: 0,
-                      child: SfRangeSliderTheme(
-                        data: SfRangeSliderThemeData(
-                          thumbRadius: 4,
-                          overlappingThumbStrokeColor: Colors.red,
-                        ),
-                        child: SfRangeSlider(
-                          dragMode: SliderDragMode.both,
-                          showTicks: true,
-                          min: 0,
-                          max: duration == 0 ? 60 : duration.toDouble(),
-                          values: _values,
-                          enableTooltip: true,
-                          tooltipTextFormatterCallback: (
-                            actualValue,
-                            formattedText,
-                          ) {
-                            return (actualValue as double).toTime();
-                          },
-                          trackShape: _TrackShape(),
-                          onChangeEnd: (value) {
-                            _play();
-                            if (widget.selectedContent.value == null ||
-                                widget.selectedContent.value!.level !=
-                                    ContentLevel.end)
-                              return;
-                            var content = widget.selectedContent.value!.clone();
-                            content.values["media"] =
-                                "${(value.start as double).toTime()}-${(value.end as double).toTime()}";
-                            widget.selectedContent.value = content;
-                          },
-                          onChanged: (SfRangeValues newValues) {
-                            _hasEndOfRangeChanged =
-                                _values.start == newValues.start;
-                            _values = newValues;
-                          },
-                        ),
+                      child: StatefulBuilder(
+                        builder: (context, setState) {
+                          return SfRangeSliderTheme(
+                            data: SfRangeSliderThemeData(
+                              thumbRadius: 4,
+                              overlappingThumbStrokeColor: Colors.red,
+                            ),
+                            child: SfRangeSlider(
+                              dragMode: SliderDragMode.both,
+                              showTicks: true,
+                              min: 0,
+                              max: duration == 0 ? 60 : duration.toDouble(),
+                              values: _values,
+                              enableTooltip: true,
+                              tooltipTextFormatterCallback: (
+                                actualValue,
+                                formattedText,
+                              ) {
+                                return (actualValue as double).toTime();
+                              },
+                              trackShape: _TrackShape(),
+                              onChangeEnd: (value) {
+                                _play();
+                                if (widget.selectedContent.value == null ||
+                                    widget.selectedContent.value!.level !=
+                                        ContentLevel.end)
+                                  return;
+                                var content =
+                                    widget.selectedContent.value!.clone();
+                                content.values["media"] =
+                                    "${(value.start as double).toTime()}-${(value.end as double).toTime()}";
+                                widget.selectedContent.value = content;
+                              },
+                              onChanged: (SfRangeValues newValues) {
+                                _hasEndOfRangeChanged =
+                                    _values.start == newValues.start;
+                                setState(() {
+                                  _values = newValues;
+                                });
+                              },
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
