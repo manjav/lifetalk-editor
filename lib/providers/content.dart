@@ -22,12 +22,21 @@ class Content {
     return "${parent!.id}_$index";
   }
 
+  /**
+   * Remove this content from its parent  
+   */
   void delete() => parent?.children?.remove(this);
 
+  /**
+   * Clone this content
+   */
   Content clone() {
     return Content(parent: parent, children: children)..values = values;
   }
 
+  /**
+   * Convert this content to json
+   */
   Map toJson() {
     var json = <String, dynamic>{};
     if (children != null) {
