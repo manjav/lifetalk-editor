@@ -20,7 +20,7 @@ class Home extends StatefulWidget {
 
 class _HomePageState extends State<Home> {
   YoutubePlayerController _controller = YoutubePlayerController(
-    initialVideoId: 'juKd26qkNAw',
+    initialVideoId: '',
     flags: const YoutubePlayerFlags(
       useHybridComposition: false,
       disableDragSeek: true,
@@ -31,13 +31,18 @@ class _HomePageState extends State<Home> {
 
   @override
   void initState() {
+    _initialize();
+    super.initState();
+  }
+
+  Future<void> _initialize() async {
     _selectedContent.addListener(() {
       String video = _selectedContent.value!.values["videoUrl"] ?? "";
       if (video.isNotEmpty && _controller.value.metaData.videoId != video) {
         _controller.load(video);
       }
     });
-    super.initState();
+    setState(() {});
   }
 
   @override

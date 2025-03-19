@@ -6,6 +6,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:lifetalk_editor/managers/device_info.dart';
+import 'package:lifetalk_editor/managers/prefs.dart';
+import 'package:lifetalk_editor/managers/service_locator.dart';
 import 'package:lifetalk_editor/router.dart';
 import 'package:lifetalk_editor/theme/theme.dart';
 
@@ -23,15 +26,33 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
   usePathUrlStrategy();
 
+  await Prefs().initialize();
+  initServices();
   runApp(const YoutubeApp());
 }
 
-///
-class YoutubeApp extends StatelessWidget {
+class YoutubeApp extends StatefulWidget {
   const YoutubeApp({super.key});
 
   @override
+  State<YoutubeApp> createState() => _YoutubeAppState();
+}
+
+class _YoutubeAppState extends State<YoutubeApp> {
+  Future<void> _initialize() async {
+    var result = await DeviceInfo.preInitialize(context, false);
+    if (result) {
+      setState(() {});
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    _initialize();
+    if (!DeviceInfo.isPreInitialized) {
+      return const SizedBox();
+    }
+
     return MaterialApp.router(
       title: 'Youtube Player IFrame Demo',
       theme: customTheme,
