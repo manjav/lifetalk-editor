@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lifetalk_editor/managers/service_locator.dart';
 import 'package:lifetalk_editor/providers/content.dart';
+import 'package:lifetalk_editor/providers/services_provider.dart';
 import 'package:lifetalk_editor/widgets/hierarchy_view.dart';
 import 'package:lifetalk_editor/widgets/inspector_view.dart';
 import 'package:lifetalk_editor/widgets/timeline_view.dart';
@@ -29,6 +31,8 @@ class _HomePageState extends State<Home> {
   );
   ValueNotifier<Content?> _selectedContent = ValueNotifier(null);
 
+  Map<String, dynamic> _categories = {};
+
   @override
   void initState() {
     _initialize();
@@ -36,6 +40,8 @@ class _HomePageState extends State<Home> {
   }
 
   Future<void> _initialize() async {
+    ServiceState state = await serviceLocator<ServicesProvider>().initialize();
+    _categories = state.data;
     _selectedContent.addListener(() {
       String video = _selectedContent.value!.values["videoUrl"] ?? "";
       if (video.isNotEmpty && _controller.value.metaData.videoId != video) {
@@ -48,8 +54,15 @@ class _HomePageState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final services = serviceLocator<ServicesProvider>();
     return Scaffold(
-      body: Column(
+      body: ListenableBuilder(
+        listenable: services,
+        builder: (context, child) {
+          if (services.state.status.index < ServiceStatus.complete.index) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Stack(
