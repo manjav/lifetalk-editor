@@ -11,9 +11,8 @@ import 'package:syncfusion_flutter_sliders/sliders.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class TimelineView extends StatefulWidget {
-  final YoutubePlayerController controller;
   final ValueNotifier<Content?> selectedContent;
-  const TimelineView(this.controller, this.selectedContent, {super.key});
+  const TimelineView(this.selectedContent, {super.key});
 
   @override
   State<TimelineView> createState() => _TimelineViewState();
@@ -36,17 +35,18 @@ class _TimelineViewState extends State<TimelineView> {
   @override
   Widget build(BuildContext context) {
     _calculateSelecedRange();
+    final videoController = YoutubePlayerController.of(context)!;
     return ValueListenableBuilder(
-      valueListenable: widget.controller,
+      valueListenable: videoController,
       builder: (context, value, child) {
         if (!value.isReady) {
           return SizedBox();
         }
         if (value.position.inMilliseconds >= _values.end) {
-          widget.controller.pause();
+          videoController.pause();
         }
         final position = value.position.inMilliseconds;
-        final duration = widget.controller.metadata.duration.inMilliseconds;
+        final duration = videoController.metadata.duration.inMilliseconds;
         return Stack(
           alignment: Alignment.topRight,
           children: [
@@ -148,7 +148,7 @@ class _TimelineViewState extends State<TimelineView> {
               child: ElevatedButton(
                 style: Themes.buttonStyle(),
                 onPressed: () {
-                  widget.controller.seekTo(
+                  videoController.seekTo(
                     Duration(milliseconds: (_values.start as double).round()),
                   );
                 },
@@ -197,7 +197,9 @@ class _TimelineViewState extends State<TimelineView> {
 
   void _play() {
     var milis = _hasEndOfRangeChanged ? _values.end - 1000 : _values.start;
-    widget.controller.seekTo(Duration(milliseconds: (milis as double).round()));
+    YoutubePlayerController.of(
+      context,
+    )?.seekTo(Duration(milliseconds: (milis as double).round()));
   }
 }
 

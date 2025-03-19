@@ -11,6 +11,7 @@ import 'package:lifetalk_editor/managers/prefs.dart';
 import 'package:lifetalk_editor/managers/service_locator.dart';
 import 'package:lifetalk_editor/router.dart';
 import 'package:lifetalk_editor/theme/theme.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -52,12 +53,21 @@ class _LifeTalkEditorState extends State<LifeTalkEditor> {
     if (!DeviceInfo.isPreInitialized) {
       return const SizedBox();
     }
-
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'Lifetalk Editor',
-      routerConfig: router,
-      theme: customTheme,
+    return InheritedYoutubePlayer(
+      controller: YoutubePlayerController(
+        initialVideoId: '',
+        flags: const YoutubePlayerFlags(
+          useHybridComposition: false,
+          disableDragSeek: true,
+          hideThumbnail: true,
+        ),
+      ),
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        title: 'Lifetalk Editor',
+        routerConfig: router,
+        theme: customTheme,
+      ),
     );
   }
 }

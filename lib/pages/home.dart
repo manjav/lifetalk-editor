@@ -21,14 +21,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomePageState extends State<Home> {
-  YoutubePlayerController _controller = YoutubePlayerController(
-    initialVideoId: '',
-    flags: const YoutubePlayerFlags(
-      useHybridComposition: false,
-      disableDragSeek: true,
-      hideThumbnail: true,
-    ),
-  );
   ValueNotifier<Content?> _selectedContent = ValueNotifier(null);
 
   Map<String, dynamic> _categories = {};
@@ -40,12 +32,13 @@ class _HomePageState extends State<Home> {
   }
 
   Future<void> _initialize() async {
+    final videoController = YoutubePlayerController.of(context)!;
     ServiceState state = await serviceLocator<ServicesProvider>().initialize();
     _categories = state.data;
     _selectedContent.addListener(() {
       String video = _selectedContent.value!.values["videoUrl"] ?? "";
-      if (video.isNotEmpty && _controller.value.metaData.videoId != video) {
-        _controller.load(video);
+      if (video.isNotEmpty && videoController.value.metaData.videoId != video) {
+        videoController.load(video);
       }
     });
     setState(() {});
@@ -63,41 +56,39 @@ class _HomePageState extends State<Home> {
             return const Center(child: CircularProgressIndicator());
           }
           return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Stack(
-            alignment: Alignment.topLeft,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(width: size.width, height: size.height),
-              SizedBox(
-                width: 600,
-                height: 400,
-                child: YoutubePlayer(controller: _controller),
-              ),
-              SizedBox(width: MediaQuery.of(context).size.width),
-              Positioned(
-                top: 76,
-                right: 0,
-                left: 600,
-                child: InspectorView(_controller, _selectedContent),
-              ),
-              TimelineView(_controller, _selectedContent),
-              Positioned(
-                top: 400,
-                width: 600,
-                bottom: 0,
-                child: HierarchyView(_selectedContent),
+              Stack(
+                alignment: Alignment.topLeft,
+                children: [
+                  SizedBox(width: size.width, height: size.height),
+                  SizedBox(
+                    width: 600,
+                    height: 400,
+                    child: YoutubePlayer(
+                      controller: YoutubePlayerController.of(context)!,
+                    ),
+                  ),
+                  SizedBox(width: MediaQuery.of(context).size.width),
+                  Positioned(
+                    top: 76,
+                    right: 0,
+                    left: 600,
+                    child: InspectorView(_selectedContent),
+                  ),
+                  TimelineView(_selectedContent),
+                  Positioned(
+                    top: 400,
+                    width: 600,
+                    bottom: 0,
+                    child: HierarchyView(_selectedContent),
+                  ),
+                ],
               ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }
