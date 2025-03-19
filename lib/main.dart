@@ -1,4 +1,4 @@
-// Copyright 2020 Sarbagya Dhaubanjar. All rights reserved.
+// Copyright 2025 Sarbagya Dhaubanjar. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -28,17 +28,17 @@ void main() async {
 
   await Prefs().initialize();
   initServices();
-  runApp(const YoutubeApp());
+  runApp(const LifeTalkEditor());
 }
 
-class YoutubeApp extends StatefulWidget {
-  const YoutubeApp({super.key});
+class LifeTalkEditor extends StatefulWidget {
+  const LifeTalkEditor({super.key});
 
   @override
-  State<YoutubeApp> createState() => _YoutubeAppState();
+  State<LifeTalkEditor> createState() => _LifeTalkEditorState();
 }
 
-class _YoutubeAppState extends State<YoutubeApp> {
+class _LifeTalkEditorState extends State<LifeTalkEditor> {
   Future<void> _initialize() async {
     var result = await DeviceInfo.preInitialize(context, false);
     if (result) {
@@ -54,10 +54,10 @@ class _YoutubeAppState extends State<YoutubeApp> {
     }
 
     return MaterialApp.router(
-      title: 'Youtube Player IFrame Demo',
-      theme: customTheme,
       debugShowCheckedModeBanner: false,
+      title: 'Lifetalk Editor',
       routerConfig: router,
+      theme: customTheme,
     );
   }
 }

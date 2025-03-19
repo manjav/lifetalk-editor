@@ -18,8 +18,9 @@ class NetConnector extends IService {
   @override
   initialize({List<Object>? args}) async {
     _session = await connect();
+    var data = await loadCategories();
     super.initialize(args: args);
-    return {};
+    return data;
   }
 
   // Connect to nakama server
@@ -111,4 +112,14 @@ class NetConnector extends IService {
       throw SkeletonException(StatusCode.UNKNOWN_ERROR, e.toString());
     }
   }
+
+  Future<void> loadCategories() async {
+    var result = await rpc(
+      "content_categories",
+      params: {"nativeLanguage": "fa", "targetLanguage": "en"},
+    );
+    return result;
+  }
+
+  Future<void> loaLesson() async {}
 }
