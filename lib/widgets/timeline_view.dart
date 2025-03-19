@@ -11,8 +11,7 @@ import 'package:syncfusion_flutter_sliders/sliders.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class TimelineView extends StatefulWidget {
-  final ValueNotifier<Content?> selectedContent;
-  const TimelineView(this.selectedContent, {super.key});
+  const TimelineView({super.key});
 
   @override
   State<TimelineView> createState() => _TimelineViewState();
@@ -34,18 +33,24 @@ class _TimelineViewState extends State<TimelineView> {
 
   @override
   Widget build(BuildContext context) {
-    _calculateSelecedRange();
     final videoController = YoutubePlayerController.of(context)!;
-    return ValueListenableBuilder(
-      valueListenable: videoController,
-      builder: (context, value, child) {
-        if (!value.isReady) {
+    final contentController = ContentController.of(context)!;
+    _calculateSelecedRange(contentController);
+    return AnimatedBuilder(
+      animation: Listenable.merge([videoController, contentController]),
+      builder: (BuildContext context, _) {
+        if (contentController.value == null) {
+          return const SizedBox();
+        }
+
+        if (!videoController.value.isReady) {
           return SizedBox();
         }
-        if (value.position.inMilliseconds >= _values.end) {
+        if (videoController.value.position.inMilliseconds >= _values.end) {
           videoController.pause();
         }
-        final position = value.position.inMilliseconds;
+
+        final position = videoController.value.position.inMilliseconds;
         final duration = videoController.metadata.duration.inMilliseconds;
         return Stack(
           alignment: Alignment.topRight,
@@ -104,15 +109,14 @@ class _TimelineViewState extends State<TimelineView> {
                               trackShape: _TrackShape(),
                               onChangeEnd: (value) {
                                 _play();
-                                if (widget.selectedContent.value == null ||
-                                    widget.selectedContent.value!.level !=
+                                if (contentController.value == null ||
+                                    contentController.value!.level !=
                                         ContentLevel.end)
                                   return;
-                                var content =
-                                    widget.selectedContent.value!.clone();
+                                var content = contentController.value!.clone();
                                 content.values["media"] =
                                     "${(value.start as double).toTime()}-${(value.end as double).toTime()}";
-                                widget.selectedContent.value = content;
+                                contentController.value = content;
                               },
                               onChanged: (SfRangeValues newValues) {
                                 _hasEndOfRangeChanged =
@@ -160,7 +164,7 @@ class _TimelineViewState extends State<TimelineView> {
               child: ElevatedButton(
                 style: Themes.buttonStyle(),
                 onPressed: () {
-                  print(jsonEncode(widget.selectedContent.value));
+                  print(jsonEncode(contentController.value));
                 },
                 child: Icon(Icons.download),
               ),
@@ -171,14 +175,14 @@ class _TimelineViewState extends State<TimelineView> {
     );
   }
 
-  void _calculateSelecedRange() {
-    widget.selectedContent.addListener(() {
+  void _calculateSelecedRange(ValueNotifier<Content?> selectedContent) {
+    selectedContent.addListener(() {
       if (_activeContent != null &&
-          _activeContent!.id == widget.selectedContent.value!.id) {
+          _activeContent!.id == selectedContent.value!.id) {
         return;
       }
-      var content = widget.selectedContent.value;
-      if (content!.values.containsKey("media")) {
+      var content = selectedContent.value;
+      if (content != null && content.values.containsKey("media")) {
         List<String> ranges = content.values["media"].split("-");
         List<double> values = [];
         for (var range in ranges) {

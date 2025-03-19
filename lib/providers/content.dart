@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Content {
   final Content? parent;
   List<Content>? children;
@@ -55,6 +57,9 @@ class Content {
   }
 }
 
+/** 
+ *  Returns the level of this content
+ */
 enum ContentLevel {
   category,
   lesson,
@@ -62,16 +67,25 @@ enum ContentLevel {
   slide,
   end;
 
+  /**
+ * Returns the child level of this content
+ */
   ContentLevel? get childLevel {
     final values = ContentLevel.values;
     return index >= values.length - 1 ? null : values[index + 1];
   }
 
+  /**
+ * Returns the parent level of this content
+ */
   ContentLevel? get parentLevel {
     final values = ContentLevel.values;
     return index <= 1 ? null : values[index - 1];
   }
 
+  /**
+ * Returns the elements of this content level
+ */
   Map<String, Type> get elemets {
     return switch (this) {
       ContentLevel.category => {
@@ -99,6 +113,39 @@ enum ContentLevel {
   }
 }
 
+/// The mode of a lesson
 enum LessonMode { imitation }
 
+/// The type of a content
 enum ContentType { caption, repeat, wordBank }
+
+/// A widget that exposes a [ContentController] to its descendants.
+class ContentController extends InheritedWidget {
+  const ContentController({
+    super.key,
+    required this.notifier,
+    required super.child,
+  });
+
+  /// The content that this widget is exposing.
+  final ValueNotifier<Content?> notifier;
+
+  /// Returns the content closest to the given context, if any.
+  static ValueNotifier<Content?>? maybeOf(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<ContentController>()
+        ?.notifier;
+  }
+
+  /// Returns the content closest to the given context.
+  static ValueNotifier<Content?>? of(BuildContext context) {
+    final result = maybeOf(context);
+    assert(result != null, 'No content found in context');
+    return result!;
+  }
+
+  /// Whether the exposed content has changed.
+  @override
+  bool updateShouldNotify(ContentController oldWidget) =>
+      notifier != oldWidget.notifier;
+}

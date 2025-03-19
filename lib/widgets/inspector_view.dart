@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intry/intry.dart';
 import 'package:lifetalk_editor/providers/content.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class InspectorView extends StatefulWidget {
-  final ValueNotifier<Content?> selectedContent;
-  const InspectorView(this.selectedContent, {super.key});
+  const InspectorView({super.key});
 
   @override
   State<InspectorView> createState() => _InspectorViewState();
@@ -14,17 +14,23 @@ class _InspectorViewState extends State<InspectorView> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: widget.selectedContent,
+      valueListenable: ContentController.of(context)!,
       builder: (context, value, child) {
         if (value == null) return SizedBox();
-        return Column(children: _rowsBuilder(value.level.elemets));
+        String video = value.values["videoUrl"] ?? "";
+        final videoController = YoutubePlayerController.of(context)!;
+        if (video.isNotEmpty &&
+            videoController.value.metaData.videoId != video) {
+          Future.microtask(() => videoController.load(video));
+        }
+        return Column(children: _rowsBuilder(value));
       },
     );
   }
 
-  List<Widget> _rowsBuilder(Map<String, Type> elemets) {
+  List<Widget> _rowsBuilder(Content content) {
     var children = <Widget>[];
-    for (var entry in elemets.entries) {
+    for (var entry in content.level.elemets.entries) {
       children.add(
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10),
@@ -33,7 +39,7 @@ class _InspectorViewState extends State<InspectorView> {
             spacing: 10,
             children: [
               Text(entry.key),
-              Expanded(child: _rowBuilder(entry.key, entry.value)),
+              Expanded(child: _rowBuilder(content, entry.key, entry.value)),
             ],
           ),
         ),
@@ -42,12 +48,12 @@ class _InspectorViewState extends State<InspectorView> {
     return children;
   }
 
-  Widget _rowBuilder(String key, Type type) {
+  Widget _rowBuilder(Content content, String key, Type type) {
     if (type == String) {
       return IntryTextField(
-        value: widget.selectedContent.value!.values[key] ?? "",
+        value: content.values[key] ?? "",
         decoration: IntryFieldDecoration.outline(context),
-        onChanged: (value) => _updateContent(key, value),
+        onChanged: (value) => _updateContent(content, key, value),
       );
     }
 
@@ -57,8 +63,8 @@ class _InspectorViewState extends State<InspectorView> {
             ContentType.values
                 .map((e) => DropdownMenuItem(value: e, child: Text(e.name)))
                 .toList(),
-        value: widget.selectedContent.value!.values[key] ?? ContentType.caption,
-        onChanged: (value) => _updateContent(key, value),
+        value: content.values[key] ?? ContentType.caption,
+        onChanged: (value) => _updateContent(content, key, value),
       );
     }
     if (type == LessonMode) {
@@ -69,9 +75,9 @@ class _InspectorViewState extends State<InspectorView> {
     return SizedBox();
   }
 
-  void _updateContent(String key, Object? value) {
-    var content = widget.selectedContent.value!.clone();
-    content.values[key] = value;
-    widget.selectedContent.value = content;
+  void _updateContent(Content content, String key, Object? value) {
+    var newContent = content.clone();
+    newContent.values[key] = value;
+    ContentController.of(context)!.value = newContent;
   }
 }

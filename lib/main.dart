@@ -9,6 +9,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:lifetalk_editor/managers/device_info.dart';
 import 'package:lifetalk_editor/managers/prefs.dart';
 import 'package:lifetalk_editor/managers/service_locator.dart';
+import 'package:lifetalk_editor/providers/content.dart';
 import 'package:lifetalk_editor/router.dart';
 import 'package:lifetalk_editor/theme/theme.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -53,20 +54,23 @@ class _LifeTalkEditorState extends State<LifeTalkEditor> {
     if (!DeviceInfo.isPreInitialized) {
       return const SizedBox();
     }
-    return InheritedYoutubePlayer(
-      controller: YoutubePlayerController(
-        initialVideoId: '',
-        flags: const YoutubePlayerFlags(
-          useHybridComposition: false,
-          disableDragSeek: true,
-          hideThumbnail: true,
+    return ContentController(
+      notifier: ValueNotifier<Content?>(null),
+      child: InheritedYoutubePlayer(
+        controller: YoutubePlayerController(
+          initialVideoId: '',
+          flags: const YoutubePlayerFlags(
+            useHybridComposition: false,
+            disableDragSeek: true,
+            hideThumbnail: true,
+          ),
         ),
-      ),
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        title: 'Lifetalk Editor',
-        routerConfig: router,
-        theme: customTheme,
+        child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          title: 'Lifetalk Editor',
+          routerConfig: router,
+          theme: customTheme,
+        ),
       ),
     );
   }

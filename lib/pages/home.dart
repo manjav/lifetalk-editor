@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:lifetalk_editor/managers/service_locator.dart';
-import 'package:lifetalk_editor/providers/content.dart';
 import 'package:lifetalk_editor/providers/services_provider.dart';
 import 'package:lifetalk_editor/widgets/hierarchy_view.dart';
 import 'package:lifetalk_editor/widgets/inspector_view.dart';
@@ -21,8 +20,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomePageState extends State<Home> {
-  ValueNotifier<Content?> _selectedContent = ValueNotifier(null);
-
   Map<String, dynamic> _categories = {};
 
   @override
@@ -32,15 +29,8 @@ class _HomePageState extends State<Home> {
   }
 
   Future<void> _initialize() async {
-    final videoController = YoutubePlayerController.of(context)!;
     ServiceState state = await serviceLocator<ServicesProvider>().initialize();
     _categories = state.data;
-    _selectedContent.addListener(() {
-      String video = _selectedContent.value!.values["videoUrl"] ?? "";
-      if (video.isNotEmpty && videoController.value.metaData.videoId != video) {
-        videoController.load(video);
-      }
-    });
     setState(() {});
   }
 
@@ -74,14 +64,14 @@ class _HomePageState extends State<Home> {
                     top: 76,
                     right: 0,
                     left: 600,
-                    child: InspectorView(_selectedContent),
+                    child: InspectorView(),
                   ),
-                  TimelineView(_selectedContent),
+                  TimelineView(),
                   Positioned(
                     top: 400,
                     width: 600,
                     bottom: 0,
-                    child: HierarchyView(_selectedContent),
+                    child: HierarchyView(),
                   ),
                 ],
               ),

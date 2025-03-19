@@ -3,8 +3,7 @@ import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:lifetalk_editor/providers/content.dart';
 
 class HierarchyView extends StatefulWidget {
-  final ValueNotifier<Content?> selectedContent;
-  const HierarchyView(this.selectedContent, {super.key});
+  const HierarchyView({super.key});
 
   @override
   State<HierarchyView> createState() => _HierarchyViewState();
@@ -31,6 +30,7 @@ class _HierarchyViewState extends State<HierarchyView> {
   @override
   Widget build(BuildContext context) {
     if (_treeController == null) return SizedBox();
+    final contentController = ContentController.of(context)!;
     return Row(
       children: [
         Expanded(
@@ -44,13 +44,13 @@ class _HierarchyViewState extends State<HierarchyView> {
               return InkWell(
                 onTap: () {
                   _treeController!.rebuild();
-                  widget.selectedContent.value = entry.node;
+                  contentController.value = entry.node;
                 },
                 child: TreeIndentation(
                   entry: entry,
                   child: Container(
                     color:
-                        widget.selectedContent.value == entry.node
+                        contentController.value == entry.node
                             ? Colors.white24
                             : Colors.transparent,
                     child: Text(text),
@@ -63,7 +63,7 @@ class _HierarchyViewState extends State<HierarchyView> {
         Column(
           children: [
             _nodeButton(Icons.add, () {
-              final content = widget.selectedContent.value!;
+              final content = contentController.value!;
               if (content.level == ContentLevel.end) {
                 return;
               }
@@ -75,8 +75,8 @@ class _HierarchyViewState extends State<HierarchyView> {
               _treeController!.expand(content);
             }),
             _nodeButton(Icons.delete, () {
-              widget.selectedContent.value!.delete();
-              widget.selectedContent.value = null;
+              contentController.value!.delete();
+              contentController.value = null;
               _treeController!.rebuild();
             }),
           ],
