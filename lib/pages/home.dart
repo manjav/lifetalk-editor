@@ -60,6 +60,7 @@ class _HomePageState extends State<Home> {
                   Positioned(
                     top: 76,
                     right: 0,
+                    bottom: 0,
                     left: 600,
                     child: InspectorView(),
                   ),

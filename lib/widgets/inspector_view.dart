@@ -26,7 +26,10 @@ class _InspectorViewState extends State<InspectorView> {
             videoController.value.metaData.videoId != video) {
           Future.microtask(() => videoController.load(video));
         }
-        return Column(children: _rowsBuilder(value));
+        return Column(
+          children: _rowsBuilder(value),
+          mainAxisSize: MainAxisSize.max,
+        );
       },
     );
   }
@@ -37,14 +40,7 @@ class _InspectorViewState extends State<InspectorView> {
       children.add(
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10),
-          height: 40,
-          child: Row(
-            spacing: 10,
-            children: [
-              Text(entry.key),
-              Expanded(child: _rowBuilder(node, entry.key, entry.value)),
-            ],
-          ),
+          child: _rowBuilder(node, entry.key, entry.value),
         ),
       );
     }
@@ -53,29 +49,70 @@ class _InspectorViewState extends State<InspectorView> {
 
   Widget _rowBuilder(Node node, String key, Type type) {
     if (type == String) {
-      return IntryTextField(
-        value: node.values[key] ?? "",
-        decoration: IntryFieldDecoration.outline(context),
-        onChanged: (value) => _updateNode(node, key, value),
+      return _rowCreator(
+        key,
+        IntryTextField(
+          value: node.values[key] ?? "",
+          decoration: IntryFieldDecoration.outline(context),
+          onChanged: (value) => _updateNode(node, key, value),
+        ),
       );
     }
 
     if (type == NodeType) {
-      return DropdownButton(
-        items:
-            NodeType.values
-                .map((e) => DropdownMenuItem(value: e, child: Text(e.name)))
-                .toList(),
-        value: node.values[key] ?? NodeType.caption,
-        onChanged: (value) => _updateNode(node, key, value),
+      return _rowCreator(
+        key,
+        DropdownButton(
+          items:
+              NodeType.values
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e.name)))
+                  .toList(),
+          value: node.values[key] ?? NodeType.caption,
+          onChanged: (value) => _updateNode(node, key, value),
+        ),
       );
     }
     if (type == LessonMode) {
       return Text("Imitation");
     }
 
-    if (type == Map) {}
+    if (type == Map) {
+      final map = node.values[key] as Map;
+      final values =
+          Node.localeNames.map((e) => MapEntry(e, map[e] ?? "")).toList();
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 10),
+          Text(key),
+          SizedBox(
+            height: 480,
+            child: ListView.builder(
+              padding: EdgeInsets.all(0),
+              itemCount: values.length,
+              itemBuilder: (context, index) {
+                return _rowCreator(
+                  values[index].key,
+                  IntryTextField(
+                    value: values[index].value ?? "",
+                    decoration: IntryFieldDecoration.outline(context),
+                    onChanged: (text) {
+                      map[values[index].key] = text;
+                      _updateNode(node, key, map);
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    }
     return SizedBox();
+  }
+
+  Widget _rowCreator(String title, Widget child) {
+    return Row(spacing: 10, children: [Text(title), Expanded(child: child)]);
   }
 
   void _updateNode(Node node, String key, Object? value) {
