@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
-import 'package:lifetalk_editor/providers/content.dart';
+import 'package:lifetalk_editor/pages/lists.dart';
+import 'package:lifetalk_editor/providers/node.dart';
+import 'package:lifetalk_editor/theme/theme.dart';
 
 class HierarchyView extends StatefulWidget {
   const HierarchyView({super.key});
@@ -75,6 +77,22 @@ class _HierarchyViewState extends State<HierarchyView> {
               nodeController.value = null;
               _treeController!.rebuild();
             }),
+            _nodeButton(Icons.folder_open, () async {
+              var result = await showDialog(
+                context: context,
+                builder: (context) => ListsPage(),
+              );
+              ;
+
+              roots.clear();
+              roots.add(Node.fromJson(result));
+              _treeController = TreeController<Node>(
+                roots: roots,
+                childrenProvider: (Node node) => node.children ?? [],
+              );
+              _treeController?.expandAll();
+              setState(() {});
+            }),
           ],
         ),
       ],
@@ -82,6 +100,14 @@ class _HierarchyViewState extends State<HierarchyView> {
   }
 
   Widget _nodeButton(IconData icon, Function() onPressed) {
-    return ElevatedButton(onPressed: onPressed, child: Icon(icon));
+    return SizedBox(
+      width: 32,
+      height: 32,
+      child: ElevatedButton(
+        style: Themes.buttonStyle(),
+        onPressed: onPressed,
+        child: Icon(icon),
+      ),
+    );
   }
 }

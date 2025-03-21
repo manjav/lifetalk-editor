@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/material.dart';
-import 'package:lifetalk_editor/providers/content.dart';
+import 'package:lifetalk_editor/providers/node.dart';
 import 'package:lifetalk_editor/theme/theme.dart';
 import 'package:lifetalk_editor/utils/extension.dart';
 import 'package:syncfusion_flutter_core/theme.dart';

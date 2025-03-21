@@ -16,12 +16,13 @@ class ServiceState {
 
 class ServicesProvider extends ChangeNotifier {
   ServiceState state = ServiceState(ServiceStatus.none);
+  Map<String, dynamic> lists = {};
 
   Future<ServiceState> initialize() async {
     await DeviceInfo.initialize();
     try {
-      var result = await serviceLocator<NetConnector>().initialize();
-      changeState(ServiceStatus.complete, data: result);
+      lists = await serviceLocator<NetConnector>().initialize();
+      changeState(ServiceStatus.complete, data: lists);
     } on SkeletonException catch (e) {
       changeState(ServiceStatus.error, exception: e);
     }

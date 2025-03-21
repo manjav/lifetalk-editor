@@ -6,9 +6,9 @@ class Themes {
   static Color activeColor = Colors.lightBlueAccent;
   static ButtonStyle buttonStyle({Color? color}) {
     return ElevatedButton.styleFrom(
+      padding: EdgeInsets.all(2),
       shadowColor: Colors.transparent,
       foregroundColor: foregroundColor,
-      maximumSize: Size(64, 40),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4),
         side: BorderSide(color: foregroundColor),

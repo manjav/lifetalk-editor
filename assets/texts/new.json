@@ -8,27 +8,27 @@
                 {
                     "children": [
                         {
-                            "range": "0:11.86-0:13.69",
+                            "range": "0:11.86-0:13.51",
                             "type": "caption",
                             "en": "My feet hurt."
                         },
                         {
-                            "range": "0:13.49-0:15.06",
+                            "range": "0:13.59-0:15.06",
                             "type": "caption",
                             "en": "Patrick， you don’t have feet."
                         },
                         {
-                            "range": "0:15.32-0:17.72",
+                            "range": "0:15.32-0:17.51",
                             "type": "caption",
                             "en": "Well， Its not fair!"
                         },
                         {
-                            "range": "0:17.54-0:22.48",
+                            "range": "0:17.54-0:22.78",
                             "type": "caption",
                             "en": "You have feet， Sandy has feet， Squidward has feet."
                         },
                         {
-                            "range": "0:22.88-0:25.74",
+                            "range": "0:22.88-0:25.72",
                             "type": "caption",
                             "en": "Actually， I have four feet."
                         }
