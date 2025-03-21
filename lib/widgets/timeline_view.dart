@@ -174,6 +174,7 @@ class _TimelineViewState extends State<TimelineView> {
           values.add(range.parseTime() * 1000);
         }
         _values = SfRangeValues(values[0], values[1]);
+        _hasEndOfRangeChanged = false;
         _play();
         _activeNode = node;
       }
