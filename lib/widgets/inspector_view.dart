@@ -17,7 +17,10 @@ class _InspectorViewState extends State<InspectorView> {
       valueListenable: NodeController.of(context)!,
       builder: (context, value, child) {
         if (value == null) return SizedBox();
-        String video = value.values["videoUrl"] ?? "";
+        String video = value.values["media"] ?? "";
+        if (video.contains("*")) {
+          video = video.split("*")[0];
+        }
         final videoController = YoutubePlayerController.of(context)!;
         if (video.isNotEmpty &&
             videoController.value.metaData.videoId != video) {
