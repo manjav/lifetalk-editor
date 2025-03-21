@@ -10,18 +10,14 @@ class HierarchyView extends StatefulWidget {
 }
 
 class _HierarchyViewState extends State<HierarchyView> {
-  List<Content> roots = [Content()];
-  TreeController<Content>? _treeController;
+  List<Node> roots = [Node()];
+  TreeController<Node>? _treeController;
 
   @override
   void initState() {
-    roots.first.children = List.generate(
-      3,
-      (i) => Content(parent: roots.first),
-    );
-    _treeController = TreeController<Content>(
+    _treeController = TreeController<Node>(
       roots: roots,
-      childrenProvider: (Content node) => node.children ?? [],
+      childrenProvider: (Node node) => node.children ?? [],
     );
     _treeController!.toggleExpansion(roots.first);
     super.initState();
@@ -30,13 +26,13 @@ class _HierarchyViewState extends State<HierarchyView> {
   @override
   Widget build(BuildContext context) {
     if (_treeController == null) return SizedBox();
-    final contentController = ContentController.of(context)!;
+    final nodeController = NodeController.of(context)!;
     return Row(
       children: [
         Expanded(
-          child: AnimatedTreeView<Content>(
+          child: AnimatedTreeView<Node>(
             treeController: _treeController!,
-            nodeBuilder: (BuildContext context, TreeEntry<Content> entry) {
+            nodeBuilder: (BuildContext context, TreeEntry<Node> entry) {
               var text = entry.node.level.name;
               if (entry.node.values.isNotEmpty) {
                 text += " [${entry.node.values.keys.join(", ")}]";
@@ -44,13 +40,13 @@ class _HierarchyViewState extends State<HierarchyView> {
               return InkWell(
                 onTap: () {
                   _treeController!.rebuild();
-                  contentController.value = entry.node;
+                  nodeController.value = entry.node;
                 },
                 child: TreeIndentation(
                   entry: entry,
                   child: Container(
                     color:
-                        contentController.value == entry.node
+                        nodeController.value == entry.node
                             ? Colors.white24
                             : Colors.transparent,
                     child: Text(text),
@@ -63,20 +59,20 @@ class _HierarchyViewState extends State<HierarchyView> {
         Column(
           children: [
             _nodeButton(Icons.add, () {
-              final content = contentController.value!;
-              if (content.level == ContentLevel.end) {
+              final node = nodeController.value!;
+              if (node.level == NodeLevel.end) {
                 return;
               }
-              if (content.children == null) {
-                content.children = [];
+              if (node.children == null) {
+                node.children = [];
               }
-              content.children?.add(Content(parent: content));
+              node.children?.add(Node(parent: node));
               _treeController!.rebuild();
-              _treeController!.expand(content);
+              _treeController!.expand(node);
             }),
             _nodeButton(Icons.delete, () {
-              contentController.value!.delete();
-              contentController.value = null;
+              nodeController.value!.delete();
+              nodeController.value = null;
               _treeController!.rebuild();
             }),
           ],

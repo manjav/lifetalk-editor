@@ -19,11 +19,11 @@ class TimelineView extends StatefulWidget {
 
 class _TimelineViewState extends State<TimelineView> {
   int _scale = 1;
-  Content? _activeContent;
+  Node? _activeNode;
   double _timelineSize = 1;
+  bool _hasEndOfRangeChanged = false;
   final _scrollController = ScrollController();
   SfRangeValues _values = SfRangeValues(0, 20);
-  bool _hasEndOfRangeChanged = false;
 
   @override
   void didChangeDependencies() {
@@ -34,12 +34,13 @@ class _TimelineViewState extends State<TimelineView> {
   @override
   Widget build(BuildContext context) {
     final videoController = YoutubePlayerController.of(context)!;
-    final contentController = ContentController.of(context)!;
-    _calculateSelecedRange(contentController);
+    final nodeController = NodeController.of(context)!;
+    _calculateSelecedRange(nodeController);
     return AnimatedBuilder(
-      animation: Listenable.merge([videoController, contentController]),
+      animation: Listenable.merge([videoController, nodeController]),
       builder: (BuildContext context, _) {
-        if (contentController.value == null) {
+        final selectedNode = nodeController.value;
+        if (selectedNode == null) {
           return const SizedBox();
         }
 
@@ -109,14 +110,11 @@ class _TimelineViewState extends State<TimelineView> {
                               trackShape: _TrackShape(),
                               onChangeEnd: (value) {
                                 _play();
-                                if (contentController.value == null ||
-                                    contentController.value!.level !=
-                                        ContentLevel.end)
-                                  return;
-                                var content = contentController.value!.clone();
-                                content.values["media"] =
+                                if (selectedNode.level != NodeLevel.end) return;
+                                var node = nodeController.value!.clone();
+                                node.values["range"] =
                                     "${(value.start as double).toTime()}-${(value.end as double).toTime()}";
-                                contentController.value = content;
+                                nodeController.value = node;
                               },
                               onChanged: (SfRangeValues newValues) {
                                 _hasEndOfRangeChanged =
@@ -175,22 +173,21 @@ class _TimelineViewState extends State<TimelineView> {
     );
   }
 
-  void _calculateSelecedRange(ValueNotifier<Content?> selectedContent) {
-    selectedContent.addListener(() {
-      if (_activeContent != null &&
-          _activeContent!.id == selectedContent.value!.id) {
+  void _calculateSelecedRange(ValueNotifier<Node?> selectedNode) {
+    selectedNode.addListener(() {
+      if (_activeNode != null && _activeNode!.id == selectedNode.value!.id) {
         return;
       }
-      var content = selectedContent.value;
-      if (content != null && content.values.containsKey("media")) {
-        List<String> ranges = content.values["media"].split("-");
+      var node = selectedNode.value;
+      if (node != null && node.values.containsKey("range")) {
+        List<String> ranges = node.values["range"].split("-");
         List<double> values = [];
         for (var range in ranges) {
           values.add(range.parseTime() * 1000);
         }
         _values = SfRangeValues(values[0], values[1]);
         _play();
-        _activeContent = content;
+        _activeNode = node;
       }
     });
   }

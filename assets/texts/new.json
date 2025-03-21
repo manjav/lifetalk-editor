@@ -1,0 +1,82 @@
+{
+    "title": "Peppa Pig: The plane is flying higher and higher",
+    "subtitle": "Fácil",
+    "iconUrl": "https://i.ytimg.com/vi/gMFKFP2uAt8/maxresdefault.jpg",
+    "children": [
+        {
+            "children": [
+                {
+                    "children": [
+                        {
+                            "range": "0:11.86-0:13.69",
+                            "type": "caption",
+                            "en": "My feet hurt."
+                        },
+                        {
+                            "range": "0:13.49-0:15.06",
+                            "type": "caption",
+                            "en": "Patrick， you don’t have feet."
+                        },
+                        {
+                            "range": "0:15.32-0:17.72",
+                            "type": "caption",
+                            "en": "Well， Its not fair!"
+                        },
+                        {
+                            "range": "0:17.54-0:22.48",
+                            "type": "caption",
+                            "en": "You have feet， Sandy has feet， Squidward has feet."
+                        },
+                        {
+                            "range": "0:22.88-0:25.74",
+                            "type": "caption",
+                            "en": "Actually， I have four feet."
+                        }
+                    ]
+                }
+            ],
+            "media": "1suAGyCEzXo*0:12-0:25.7"
+        },
+        {
+            "children": [
+                {
+                    "children": [
+                        {
+                            "range": "0:11.98-0:13.37",
+                            "type": "wordBank",
+                            "en": "My {feet} hurt.∆hand|eyes"
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "range": "0:13.60-0:15.62",
+                            "type": "wordBank",
+                            "en": "Patrick， you don’t {have} feet.∆need|want"
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "range": "0:22.89-0:25.00",
+                            "type": "wordBank",
+                            "en": "Actually， I have {four} feet .∆eight|five"
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "range": "0:23.48-0:24.49",
+                            "type": "repeat",
+                            "en": "I have 4 {feet} ."
+                        }
+                    ]
+                }
+            ],
+            "media": "1suAGyCEzXo*0:12-0:25.7"
+        }
+    ]
+}

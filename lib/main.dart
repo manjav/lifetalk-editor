@@ -9,7 +9,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:lifetalk_editor/managers/device_info.dart';
 import 'package:lifetalk_editor/managers/prefs.dart';
 import 'package:lifetalk_editor/managers/service_locator.dart';
-import 'package:lifetalk_editor/providers/content.dart';
+import 'package:lifetalk_editor/providers/node.dart';
 import 'package:lifetalk_editor/router.dart';
 import 'package:lifetalk_editor/theme/theme.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -54,8 +54,8 @@ class _LifeTalkEditorState extends State<LifeTalkEditor> {
     if (!DeviceInfo.isPreInitialized) {
       return const SizedBox();
     }
-    return ContentController(
-      notifier: ValueNotifier<Content?>(null),
+    return NodeController(
+      notifier: ValueNotifier<Node?>(null),
       child: InheritedYoutubePlayer(
         controller: YoutubePlayerController(
           initialVideoId: '',
