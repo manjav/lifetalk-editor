@@ -1,6 +1,24 @@
 import 'package:flutter/material.dart';
 
 class Node {
+  static const localeNames = [
+    "en",
+    "es",
+    "pt",
+    "fa",
+    "tr",
+    "fr",
+    "it",
+    "pl",
+    "cs",
+    "ru",
+    "ko",
+    "ja",
+    "vi",
+    "th",
+    "zh",
+    "ar",
+  ];
   final Node? parent;
   List<Node>? children;
   NodeLevel level = NodeLevel.lesson;
@@ -120,14 +138,7 @@ enum NodeLevel {
         "iconUrl": String,
       },
       NodeLevel.serie => {"media": String},
-      NodeLevel.end => {
-        "type": NodeType,
-        "en": String,
-        "es": String,
-        "pt": String,
-        "fa": String,
-        "range": String,
-      },
+      NodeLevel.end => {"type": NodeType, "range": String, "locales": Map},
       _ => {},
     };
   }

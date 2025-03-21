@@ -6,7 +6,6 @@ class Content {
   final ParentContent? parent;
   ContentType type = ContentType.none;
   TranslationSide side = TranslationSide.none;
-  String nativeValue = "", targetValue = "";
   Content.create(this.parent, this.id, Map map) {
     index = map["index"] ?? 0;
   }
@@ -53,14 +52,6 @@ class Content {
     return categories;
   }
 
-  String getText(TranslationSide side) {
-    return switch (side) {
-      TranslationSide.native => nativeValue,
-      TranslationSide.target => targetValue,
-      _ => "",
-    };
-  }
-
   Map toJson() {
     var json = <String, dynamic>{};
 
@@ -76,24 +67,17 @@ class Content {
     }
     if (type == ContentType.serie) {
       json["media"] = (this as Serie).media?.id.substring(7);
-    } /* else if (parent != null && parent!.type == ContentType.serie) {
-      if ((this as ParentContent).majority != null) {
-        json["type"] = (this as ParentContent).majority!.type.name;
-      } else {}
-    } */
-    // if (type == ContentType.repeat || type == ContentType.wordBank) {
-    //   json["type"] = type.name;
-    // }
+    }
     if (this is Talk) {
+      final talk = this as Talk;
       json["type"] = type.name;
-      if ((this as Talk).data != null) {
-        final media = (this as Talk).data as MediaEntry;
+      if (talk.data != null) {
+        final media = talk.data as MediaEntry;
         json["range"] =
             "${(media.start * 1000).toTime()}-${((media.end ?? 0) * 1000).toTime()}";
       }
-      json["en"] = targetValue;
+      json["locales"] = talk.locales;
     }
-    // json["fa"] = nativeValue;
 
     return json;
   }
@@ -157,17 +141,20 @@ class Serie extends ParentContent {
 class Talk extends Content {
   dynamic data;
   int score = 0;
-  // QuizRecord? lastRecord;
-  Set<String> get words => {...targetValue.split(" ")};
-  Talk.create(
-    ParentContent parent,
-    int index,
-    Map map,
-    String nativeLanguage,
-    String targetLanguage,
-  ) : super.create(parent, map["id"], map) {
-    nativeValue = map[nativeLanguage];
-    targetValue = map[targetLanguage];
+  Map<String, String> locales = {};
+  Talk.create(ParentContent parent, int index, Map map)
+    : super.create(parent, map["id"], map) {
+    for (var entry in map.entries) {
+      if (entry.key == "serie_index" ||
+          entry.key == "slide_index" ||
+          entry.key == "group_id" ||
+          entry.key == "index" ||
+          entry.key == "type" ||
+          entry.key == "id")
+        continue;
+      locales[entry.key] = entry.value;
+    }
+
     if (map["type"].endsWith("_1")) {
       type = ContentType.user;
     } else if (map["type"].endsWith("_2")) {
@@ -284,44 +271,3 @@ enum PresentMode {
   bool get hasNative => this == PresentMode.native || this == PresentMode.both;
   bool get hasTarget => this == PresentMode.target || this == PresentMode.both;
 }
-
-/* 
-class Word extends Content {
-  int count = 0;
-  DateTime? firstReview;
-  DateTime? lastReview;
-  DateTime? nextReview;
-  Word.create(Content? parent, String id, Map map)
-      : super.create(parent, id, map) {
-    count = map["count"] ?? 0;
-    nativeValue = map["native"] ?? "";
-    targetValue = map["target"] ?? "";
-    if (!map.containsKey("first")) return;
-    firstReview = DateExtension.fromDaysSinceEpoch(map["first"]);
-    lastReview = DateExtension.fromDaysSinceEpoch(map["last"]);
-    nextReview = DateExtension.fromDaysSinceEpoch(map["next"]);
-  }
-
-  static Word fromMap(Content? parent, String id, Map map) =>
-      Word.create(parent, id, map);
-
-  Map<String, dynamic> toMap() {
-    return {
-      "count": count,
-      "native": nativeValue,
-      "target": targetValue,
-      "first": firstReview!.daysSinceEpoch,
-      "last": lastReview!.daysSinceEpoch,
-      "next": nextReview!.daysSinceEpoch,
-    };
-  } 
-
-  static Map<String, Word> allFromMap(Map data) {
-    var map = <String, Word>{};
-    for (var entry in data.entries) {
-      map[entry.key] = Word.fromMap(null, entry.key, entry.value);
-    }
-    return map;
-  }
-}
-*/

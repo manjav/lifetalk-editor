@@ -123,7 +123,7 @@ class NetConnector extends IService {
   Future<void> loadGroup(ParentContent group) async {
     final result = await rpc<List<dynamic>>(
       "content_contents",
-      params: {"groupId": group.id, "nativeLanguage": "fa"},
+      params: {"groupId": group.id, "editMode": true},
     );
     _addContentChildren(group, result, ContentType.serie);
   }
@@ -147,7 +147,7 @@ class NetConnector extends IService {
               "lesson_${video.split("embed/").last}",
             );
           } else {
-            children.add(Talk.create(group, i, list[i], "fa", "en"));
+            children.add(Talk.create(group, i, list[i]));
           }
         }
       }

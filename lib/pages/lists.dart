@@ -19,8 +19,10 @@ class _ListsPageState extends State<ListsPage> {
     super.initState();
   }
 
-  Future<void> _loadLists() async =>
-      _lists = await serviceLocator<NetConnector>().loadLists();
+  Future<void> _loadLists() async {
+    _lists = await serviceLocator<NetConnector>().loadLists();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
