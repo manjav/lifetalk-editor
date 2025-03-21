@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:advertising_id/advertising_id.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -233,16 +232,7 @@ class DeviceInfo {
       return Prefs.setString("deviceId", StringExtensions.getRandomString(20));
     }
 
-    try {
-      if (!isWeb) {
-        adId = (await AdvertisingId.id(false))!;
-      }
-      if (adId.isEmpty || adId.startsWith("0000")) {
-        adId = createId();
-      }
-    } catch (e) {
-      adId = createId();
-    }
+    adId = createId();
   }
 }
 
