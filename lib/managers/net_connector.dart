@@ -18,9 +18,7 @@ class NetConnector extends IService {
   @override
   initialize({List<Object>? args}) async {
     _session = await connect();
-    var data = await loadCategories();
     super.initialize(args: args);
-    return data;
   }
 
   // Connect to nakama server

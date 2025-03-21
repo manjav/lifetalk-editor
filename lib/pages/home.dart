@@ -20,8 +20,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomePageState extends State<Home> {
-  Map<String, dynamic> _categories = {};
-
   @override
   void initState() {
     _initialize();
@@ -29,8 +27,7 @@ class _HomePageState extends State<Home> {
   }
 
   Future<void> _initialize() async {
-    ServiceState state = await serviceLocator<ServicesProvider>().initialize();
-    _categories = state.data;
+    await serviceLocator<ServicesProvider>().initialize();
     setState(() {});
   }
 
