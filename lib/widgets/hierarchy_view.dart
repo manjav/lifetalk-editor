@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:lifetalk_editor/pages/lists.dart';
@@ -93,6 +95,10 @@ class _HierarchyViewState extends State<HierarchyView> {
               _treeController?.expandAll();
               setState(() {});
             }),
+            _nodeButton(
+              Icons.download,
+              () => print(jsonEncode(nodeController.value)),
+            ),
           ],
         ),
       ],

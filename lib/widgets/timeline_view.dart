@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:cart_stepper/cart_stepper.dart';
@@ -148,23 +147,12 @@ class _TimelineViewState extends State<TimelineView> {
             Positioned(
               right: 120,
               child: ElevatedButton(
-                style: Themes.buttonStyle(),
-                onPressed: () {
-                  videoController.seekTo(
-                    Duration(milliseconds: (_values.start as double).round()),
-                  );
-                },
                 child: Icon(Icons.replay),
-              ),
-            ),
-            Positioned(
-              right: 190,
-              child: ElevatedButton(
                 style: Themes.buttonStyle(),
-                onPressed: () {
-                  print(jsonEncode(contentController.value));
-                },
-                child: Icon(Icons.download),
+                onPressed:
+                    () => videoController.seekTo(
+                      Duration(milliseconds: (_values.start as double).round()),
+                    ),
               ),
             ),
           ],
