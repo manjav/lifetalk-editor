@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifetalk_editor/managers/net_connector.dart';
 import 'package:lifetalk_editor/managers/service_locator.dart';
-import 'package:lifetalk_editor/providers/services_provider.dart';
+import 'package:lifetalk_editor/providers/content.dart';
 
 class ListsPage extends StatefulWidget {
   const ListsPage({super.key});
@@ -30,30 +30,29 @@ class _ListsPageState extends State<ListsPage> {
     );
   }
 
-  Widget _itemBuilder(Map list) {
-    final groups = list["groups"].values.toList();
+  Widget _itemBuilder(ParentContent list) {
+    Widget itemBuilder(Content group) {
+      var lesson = group as ParentContent;
+      return _buttonBuilder(lesson, list.title);
+    }
+
     return Container(
       color: Theme.of(context).colorScheme.surface,
       child: Column(
         children: [
           SizedBox(height: 5),
-          for (var group in groups)
-            _buttonBuilder(
-              group,
-              group["title"] != "" ? group["title"] : list["title"],
-            ),
+          for (var group in list.children) itemBuilder(group),
         ],
       ),
     );
   }
 
-  Widget _buttonBuilder(Map group, String title) {
+  Widget _buttonBuilder(ParentContent lesson, String title) {
     return ElevatedButton(
       child: Text(title),
       onPressed: () async {
-        var text = await rootBundle.loadString("assets/texts/new.json");
-        final lesson = jsonDecode(text);
-        Navigator.pop(context, lesson);
+        await serviceLocator<NetConnector>().loadGroup(lesson);
+        Navigator.pop(context, lesson.toJson());
       },
     );
   }

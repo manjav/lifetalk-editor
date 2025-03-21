@@ -140,6 +140,7 @@ enum LessonMode { imitation }
 enum NodeType {
   caption,
   repeat,
+  station,
   wordBank;
 
   static NodeType valuesByName(String name) =>

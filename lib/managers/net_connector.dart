@@ -5,6 +5,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:grpc/grpc.dart' as grpc;
 import 'package:lifetalk_editor/managers/device_info.dart';
 import 'package:lifetalk_editor/managers/service.dart';
+import 'package:lifetalk_editor/providers/content.dart';
 import 'package:lifetalk_editor/providers/responses.dart';
 import 'package:lifetalk_editor/utils/extension.dart';
 import 'package:nakama/nakama.dart';
@@ -111,13 +112,77 @@ class NetConnector extends IService {
     }
   }
 
-  Future<void> loadCategories() async {
+  Future<List<ParentContent>> loadLists() async {
     var result = await rpc(
       "content_categories",
       params: {"nativeLanguage": "fa", "targetLanguage": "en"},
     );
-    return result;
+    return Content.createAll(result);
   }
 
-  Future<void> loaLesson() async {}
+  Future<void> loadGroup(ParentContent group) async {
+    final result = await rpc<List<dynamic>>(
+      "content_contents",
+      params: {"groupId": group.id, "nativeLanguage": "fa"},
+    );
+    _addContentChildren(group, result, ContentType.serie);
+  }
+
+  void _addContentChildren(ParentContent group, List list, ContentType type) {
+    var children = <Content>[];
+    if (type == ContentType.talk) {
+      for (var i = 0; i < list.length; i++) {
+        if (list[i]["type"] == "title") {
+          group.parent!.title = list[i]["fa"];
+        } else {
+          String video = list[i]["en"];
+          if (list[i]["type"] == "video") {
+            (group.parent! as Serie).media = MediaEntry.parse(
+              MediaType.video,
+              "lesson_$video",
+            );
+          } else if (list[i]["type"] == "youtube") {
+            (group.parent! as Serie).media = MediaEntry.parse(
+              MediaType.video,
+              "lesson_${video.split("embed/").last}",
+            );
+          } else {
+            children.add(Talk.create(group, i, list[i], "fa", "en"));
+          }
+        }
+      }
+    } else {
+      final key = "${type.name}_index";
+      var map = <int, List>{};
+      for (var i = 0; i < list.length; i++) {
+        final index = list[i][key];
+        if (!map.containsKey(index)) {
+          map[index] = [];
+        }
+        map[index]!.add(list[i]);
+      }
+
+      for (var entry in map.entries) {
+        ParentContent child;
+        if (type == ContentType.serie) {
+          child = Serie.create(group, type, "${group.id}_${entry.key}", {
+            "index": entry.key,
+          });
+        } else {
+          child = ParentContent.create(
+            group,
+            type,
+            "${group.id}_${entry.key}",
+            {"index": entry.key},
+          );
+        }
+        _addContentChildren(child, entry.value, type.getChild());
+        if (child.children.isNotEmpty) {
+          children.add(child);
+        }
+      }
+    }
+    children.sort((a, b) => a.index - b.index);
+    group.children = children;
+  }
 }

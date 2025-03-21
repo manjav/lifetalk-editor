@@ -32,8 +32,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/texts/
 
 icons_launcher:
   image_path: ../screenshots/logo.png
