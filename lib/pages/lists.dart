@@ -45,7 +45,16 @@ class _ListsPageState extends State<ListsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            spacing: 16,
+            children: [
           Text(list.values["titles"]["en"]),
+              Text(
+                list.values["subtitles"]["en"],
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
           for (var i = 0; i < list.children!.length; i++)
             _buttonBuilder(list, list.children![i]),
         ],
@@ -55,12 +64,23 @@ class _ListsPageState extends State<ListsPage> {
 
   Widget _buttonBuilder(Node list, Node lesson) {
     String lessonTitle =
-        lesson.values["titles"]["en"] != null
+        lesson.values["titles"].length > 0
             ? lesson.values["titles"]["en"]
-            : list.values["titles"]["en"];
+            : "---";
+
+    String lessonSubtitle =
+        lesson.values["subtitles"].length > 0
+            ? lesson.values["subtitles"]["en"]
+            : "---";
 
     return ElevatedButton(
-      child: Text(lessonTitle),
+      child: Row(
+        spacing: 16,
+        children: [
+          Text(lessonTitle),
+          Text(lessonSubtitle, style: TextStyle(color: Colors.grey)),
+        ],
+      ),
       onPressed: () async {
         // Embeded group
         if (lesson.children != null) {
