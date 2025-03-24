@@ -22,7 +22,7 @@ class Content {
   bool get isStation =>
       isQuiz || type == ContentType.video || type == ContentType.youtube;
 
-  static List<ParentContent> createAll(Map map) {
+  static List<ParentContent> createLists(Map map) {
     List<ParentContent> categories = [];
     for (var entry in map.entries) {
       var category = ParentContent.create(
