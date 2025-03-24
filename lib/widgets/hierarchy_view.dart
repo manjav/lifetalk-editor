@@ -106,6 +106,8 @@ class _HierarchyViewState extends State<HierarchyView> {
               final json = nodeController.value!.toJson();
               final list = nodeController.value!.parent!;
               json["categoryId"] = list.id;
+              json["categoryTitles"] = list.values["titles"];
+              json["categorySubtitles"] = list.values["subtitles"];
               serviceLocator<NetConnector>().rpc(
                 "content_group_set",
                 params: json,

@@ -48,7 +48,7 @@ class _ListsPageState extends State<ListsPage> {
           Row(
             spacing: 16,
             children: [
-          Text(list.values["titles"]["en"]),
+              Text(list.values["titles"]["en"]),
               Text(
                 list.values["subtitles"]["en"],
                 style: TextStyle(color: Colors.grey),
