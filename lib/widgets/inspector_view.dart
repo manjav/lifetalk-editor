@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intry/intry.dart';
+import 'package:lifetalk_editor/pages/locales.dart';
 import 'package:lifetalk_editor/providers/node.dart';
+import 'package:lifetalk_editor/utils/extension.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class InspectorView extends StatefulWidget {
@@ -49,12 +50,16 @@ class _InspectorViewState extends State<InspectorView> {
 
   Widget _rowBuilder(Node node, String key, Type type) {
     if (type == String) {
+      String text = node.values[key] ?? "";
       return _rowCreator(
         key,
-        IntryTextField(
-          value: node.values[key] ?? "",
-          decoration: IntryFieldDecoration.outline(context),
-          onChanged: (value) => _updateNode(node, key, value),
+        TextField(
+          textDirection: text.getDirection(),
+          controller: TextEditingController(text: text),
+          onSubmitted: (text) {
+            node.values[key] = text;
+            // setState(() {});
+          },
         ),
       );
     }
@@ -65,7 +70,12 @@ class _InspectorViewState extends State<InspectorView> {
         DropdownButton(
           items:
               NodeType.values
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e.name)))
+                  .map(
+                    (e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(e.name.toPascalCase()),
+                    ),
+                  )
                   .toList(),
           value: node.values[key] ?? NodeType.caption,
           onChanged: (value) => _updateNode(node, key, value),
@@ -77,42 +87,16 @@ class _InspectorViewState extends State<InspectorView> {
     }
 
     if (type == Map) {
-      final map = node.values[key] as Map;
-      final values =
-          Node.localeNames.map((e) => MapEntry(e, map[e] ?? "")).toList();
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 10),
-          Text(key),
-          SizedBox(
-            height: 480,
-            child: ListView.builder(
-              padding: EdgeInsets.all(0),
-              itemCount: values.length,
-              itemBuilder: (context, index) {
-                return _rowCreator(
-                  values[index].key,
-                  IntryTextField(
-                    value: values[index].value ?? "",
-                    decoration: IntryFieldDecoration.outline(context),
-                    onChanged: (text) {
-                      map[values[index].key] = text;
-                      _updateNode(node, key, map);
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      );
+      return _rowCreator(key, LocaleButton(node, key));
     }
     return SizedBox();
   }
 
   Widget _rowCreator(String title, Widget child) {
-    return Row(spacing: 10, children: [Text(title), Expanded(child: child)]);
+    return Row(
+      spacing: 20,
+      children: [Text(title.toPascalCase()), Expanded(child: child)],
+    );
   }
 
   void _updateNode(Node node, String key, Object? value) {
