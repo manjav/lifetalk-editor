@@ -52,7 +52,65 @@ class Content {
     return categories;
   }
 
-  Map toJson() {
+  static void createGroups(ParentContent group, List list, ContentType type) {
+    var children = <Content>[];
+    if (type == ContentType.talk) {
+      for (var i = 0; i < list.length; i++) {
+        if (list[i]["type"] == "title") {
+          group.parent!.title = list[i]["fa"];
+        } else {
+          String video = list[i]["en"];
+          if (list[i]["type"] == "video") {
+            (group.parent! as Serie).media = MediaEntry.parse(
+              MediaType.video,
+              "lesson_$video",
+            );
+          } else if (list[i]["type"] == "youtube") {
+            (group.parent! as Serie).media = MediaEntry.parse(
+              MediaType.video,
+              "lesson_${video.split("embed/").last}",
+            );
+          } else {
+            children.add(Talk.create(group, i, list[i]));
+          }
+        }
+      }
+    } else {
+      final key = "${type.name}_index";
+      var map = <int, List>{};
+      for (var i = 0; i < list.length; i++) {
+        final index = list[i][key];
+        if (!map.containsKey(index)) {
+          map[index] = [];
+        }
+        map[index]!.add(list[i]);
+      }
+
+      for (var entry in map.entries) {
+        ParentContent child;
+        if (type == ContentType.serie) {
+          child = Serie.create(group, type, "${group.id}_${entry.key}", {
+            "index": entry.key,
+          });
+        } else {
+          child = ParentContent.create(
+            group,
+            type,
+            "${group.id}_${entry.key}",
+            {"index": entry.key},
+          );
+        }
+        createGroups(child, entry.value, type.getChild());
+        if (child.children.isNotEmpty) {
+          children.add(child);
+        }
+      }
+    }
+    children.sort((a, b) => a.index - b.index);
+    group.children = children;
+  }
+
+  Map<String, dynamic> toJson() {
     var json = <String, dynamic>{};
 
     if (type == ContentType.group) {
