@@ -163,7 +163,8 @@ class _TimelineViewState extends State<TimelineView> {
 
   void _calculateSelecedRange(ValueNotifier<Node?> selectedNode) {
     selectedNode.addListener(() {
-      if (_activeNode != null && _activeNode!.id == selectedNode.value!.id) {
+      if (selectedNode.value == null ||
+          (_activeNode != null && _activeNode!.id == selectedNode.value!.id)) {
         return;
       }
       var node = selectedNode.value;

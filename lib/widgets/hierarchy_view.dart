@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
+import 'package:lifetalk_editor/managers/net_connector.dart';
+import 'package:lifetalk_editor/managers/service_locator.dart';
 import 'package:lifetalk_editor/pages/lists.dart';
 import 'package:lifetalk_editor/providers/node.dart';
 import 'package:lifetalk_editor/theme/theme.dart';
@@ -70,7 +72,11 @@ class _HierarchyViewState extends State<HierarchyView> {
               if (node.children == null) {
                 node.children = [];
               }
-              node.children?.add(Node(parent: node));
+              var newNode = Node(parent: node);
+              if (node.level == NodeLevel.slide) {
+                newNode.values["locales"] = {};
+              }
+              node.children?.add(newNode);
               _treeController!.rebuild();
               _treeController!.expand(node);
             }),
@@ -84,10 +90,9 @@ class _HierarchyViewState extends State<HierarchyView> {
                 context: context,
                 builder: (context) => ListsPage(),
               );
-              ;
 
               roots.clear();
-              roots.add(Node.fromJson(result));
+              roots.add(result);
               _treeController = TreeController<Node>(
                 roots: roots,
                 childrenProvider: (Node node) => node.children ?? [],
@@ -95,10 +100,17 @@ class _HierarchyViewState extends State<HierarchyView> {
               _treeController?.expandAll();
               setState(() {});
             }),
-            _nodeButton(
-              Icons.download,
-              () => print(jsonEncode(nodeController.value)),
-            ),
+            _nodeButton(Icons.save, () {
+              if (nodeController.value == null) return;
+              if (nodeController.value!.level != NodeLevel.lesson) return;
+              final json = nodeController.value!.toJson();
+              final list = nodeController.value!.parent!;
+              json["categoryId"] = list.id;
+              serviceLocator<NetConnector>().rpc(
+                "content_group_set",
+                params: json,
+              );
+            }),
           ],
         ),
       ],

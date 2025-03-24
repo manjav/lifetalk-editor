@@ -17,7 +17,6 @@ dependencies:
   syncfusion_flutter_sliders: ^28.2.11
   youtube_player_flutter: ^9.1.1
   flutter_fancy_tree_view: ^1.6.0
-  intry: ^0.3.2
   nakama: ^1.0.5
   package_info_plus: ^8.2.1
   device_info_plus: ^11.3.0
@@ -25,6 +24,7 @@ dependencies:
   flutter_timezone: ^4.1.0
   get_it: ^8.0.0
   grpc: ^3.2.4
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
