@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 import 'dart:math';
 
-import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' as intl;
+import 'package:intl/intl.dart' show DateFormat, NumberFormat;
 
 extension NumExtension on num {
   // String toTime({String separator = ":"}) {
@@ -159,6 +161,11 @@ extension StringExtensions on String {
   String l([List<int>? list]) {
     return this;
   }
+
+  TextDirection? getDirection() =>
+      intl.Bidi.detectRtlDirectionality(this)
+          ? TextDirection.rtl
+          : TextDirection.ltr;
 }
 
 extension DateExtension on DateTime {

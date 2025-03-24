@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifetalk_editor/managers/net_connector.dart';
 import 'package:lifetalk_editor/managers/service_locator.dart';
-import 'package:lifetalk_editor/providers/content.dart';
+import 'package:lifetalk_editor/providers/node.dart';
 
 class ListsPage extends StatefulWidget {
   const ListsPage({super.key});
@@ -11,7 +11,7 @@ class ListsPage extends StatefulWidget {
 }
 
 class _ListsPageState extends State<ListsPage> {
-  List<ParentContent> _lists = [];
+  List<Node> _lists = [];
 
   @override
   void initState() {
@@ -20,7 +20,12 @@ class _ListsPageState extends State<ListsPage> {
   }
 
   Future<void> _loadLists() async {
-    _lists = await serviceLocator<NetConnector>().loadLists();
+    var lists = await serviceLocator<NetConnector>().loadLists();
+    for (var list in lists) {
+      var json = list.toJson();
+      var node = Node.fromDBJson(json, level: NodeLevel.category);
+      _lists.add(node);
+    }
     setState(() {});
   }
 
@@ -32,29 +37,44 @@ class _ListsPageState extends State<ListsPage> {
     );
   }
 
-  Widget _itemBuilder(ParentContent list) {
-    Widget itemBuilder(Content group) {
-      var lesson = group as ParentContent;
-      return _buttonBuilder(lesson, list.title);
-    }
-
+  Widget _itemBuilder(Node list) {
     return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      alignment: Alignment.centerLeft,
       color: Theme.of(context).colorScheme.surface,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 5),
-          for (var group in list.children) itemBuilder(group),
+          Text(list.values["titles"]["en"]),
+          for (var i = 0; i < list.children!.length; i++)
+            _buttonBuilder(list, list.children![i]),
         ],
       ),
     );
   }
 
-  Widget _buttonBuilder(ParentContent lesson, String title) {
+  Widget _buttonBuilder(Node list, Node lesson) {
+    String lessonTitle =
+        lesson.values["titles"]["en"] != null
+            ? lesson.values["titles"]["en"]
+            : list.values["titles"]["en"];
+
     return ElevatedButton(
-      child: Text(title),
+      child: Text(lessonTitle),
       onPressed: () async {
-        await serviceLocator<NetConnector>().loadGroup(lesson);
-        Navigator.pop(context, lesson.toJson());
+        // Embeded group
+        if (lesson.children != null) {
+          Navigator.pop(context, lesson);
+          return;
+        }
+
+        var group = await serviceLocator<NetConnector>().loadGroup(
+          lesson.id,
+          lesson.values,
+        );
+        var newNode = Node.fromDBJson(group.toJson());
+        lesson.children = newNode.children;
+        Navigator.pop(context, list);
       },
     );
   }

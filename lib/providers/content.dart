@@ -113,11 +113,14 @@ class Content {
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{};
 
-    if (type == ContentType.group) {
-      var group = this as ParentContent;
-      json["title"] = group.title;
-      json["subtitle"] = group.subtitle;
-      json["iconUrl"] = group.iconUrl;
+    if (type == ContentType.group || type == ContentType.category) {
+      var container = this as ParentContent;
+      json["id"] = id;
+      json["index"] = index;
+      json["mode"] = container.mode;
+      json["titles"] = container.titles;
+      json["subtitles"] = container.subtitles;
+      json["iconUrl"] = container.iconUrl;
     }
 
     if (children.isNotEmpty) {
@@ -128,6 +131,7 @@ class Content {
     }
     if (this is Talk) {
       final talk = this as Talk;
+      json["id"] = id;
       json["type"] = type.name;
       if (talk.data != null) {
         final media = talk.data as MediaEntry;
@@ -176,6 +180,7 @@ class ParentContent extends Content {
   int score = 0;
   int passedOrder = 100000;
   String title = "", subtitle = "", iconUrl = "", mode = "";
+  Map<String, dynamic> titles = {}, subtitles = {};
   Content? majority;
   ParentContent.create(
     ParentContent? parent,
@@ -186,6 +191,8 @@ class ParentContent extends Content {
     this.type = type;
     title = map["title"] ?? "";
     subtitle = map["subtitle"] ?? "";
+    titles = map["titles"] ?? {};
+    subtitles = map["subtitles"] ?? {};
     iconUrl = map["iconUrl"] ?? "";
     mode = map["mode"] ?? "";
   }

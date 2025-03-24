@@ -23,19 +23,25 @@ class Node {
   List<Node>? children;
   NodeLevel level = NodeLevel.lesson;
   Map<String, dynamic> values = {};
-  Node({this.parent, this.children}) {
-    level = parent?.level.childLevel ?? NodeLevel.lesson;
-  }
+  Node({this.parent, this.children, this.level = NodeLevel.category});
 
   /**
    * Returns the index of this node in its parent
    */
-  int get index => parent == null ? 0 : parent!.children!.indexOf(this);
+  int get index {
+    if (values.containsKey("index")) {
+      return values["index"];
+    }
+    return parent == null ? 0 : parent!.children!.indexOf(this);
+  }
 
   /**
    * Returns the id of this node
    */
   String get id {
+    if (values.containsKey("id")) {
+      return values["id"];
+    }
     if (parent == null) {
       return "$index";
     }
@@ -51,7 +57,8 @@ class Node {
    * Clone this node
    */
   Node clone() {
-    return Node(parent: parent, children: children)..values = values;
+    return Node(parent: parent, children: children, level: level)
+      ..values = values;
   }
 
   /**
@@ -74,13 +81,23 @@ class Node {
     return json;
   }
 
-  static Node fromJson(Map<String, dynamic> map, {Node? parent}) {
-    var node = Node(parent: parent);
+  static Node fromDBJson(
+    Map<String, dynamic> map, {
+    Node? parent,
+    NodeLevel level = NodeLevel.lesson,
+  }) {
+    var node = Node(parent: parent, level: level);
     for (var entry in map.entries) {
       if (entry.key == "children") {
         node.children =
             (entry.value as List)
-                .map((e) => Node.fromJson(e, parent: node))
+                .map(
+                  (e) => Node.fromDBJson(
+                    e,
+                    parent: node,
+                    level: node.level.childLevel!,
+                  ),
+                )
                 .toList();
       } else {
         if (entry.key == "type") {
@@ -90,7 +107,6 @@ class Node {
         }
       }
     }
-    // node.values = <String, dynamic>{};
     return node;
   }
 }
@@ -127,14 +143,16 @@ enum NodeLevel {
   Map<String, Type> get elemets {
     return switch (this) {
       NodeLevel.category => {
-        "title": String,
-        "subtitle": String,
+        "id": String,
+        "titles": Map,
+        "subtitles": Map,
         "iconUrl": String,
       },
       NodeLevel.lesson => {
+        "id": String,
         "mode": LessonMode,
-        "title": String,
-        "subtitle": String,
+        "titles": Map,
+        "subtitles": Map,
         "iconUrl": String,
       },
       NodeLevel.serie => {"media": String},
