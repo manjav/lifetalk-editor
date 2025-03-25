@@ -68,8 +68,8 @@ class _ListsPageState extends State<ListsPage> {
         ),
         Expanded(
           child: ListView.builder(
-      itemCount: _lists.length,
-      itemBuilder: (_, index) => _itemBuilder(_lists[index]),
+            itemCount: _lists.length,
+            itemBuilder: (_, index) => _itemBuilder(_lists[index]),
           ),
         ),
       ],
@@ -113,6 +113,13 @@ class _ListsPageState extends State<ListsPage> {
             : "---";
 
     return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: WidgetStatePropertyAll(
+          _updatedLessons.containsKey(lesson.id)
+              ? Colors.blueGrey
+              : Colors.blue.shade900,
+        ),
+      ),
       child: Row(
         spacing: 16,
         children: [
