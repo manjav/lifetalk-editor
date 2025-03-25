@@ -41,7 +41,7 @@ class _ListsPageState extends State<ListsPage> {
       for (var i = 0; i < node.children!.length; i++) {
         final id = node.children![i].id;
         if (_updatedLessons.containsKey(id)) {
-          node.children![i] = _updatedLessons[id]!;
+          node.children![i] = _updatedLessons[id]!.clone(overrideParent: node);
         }
       }
       _lists.add(node);
@@ -140,7 +140,7 @@ class _ListsPageState extends State<ListsPage> {
         );
         var newNode = Node.fromDBJson(group.toJson());
         lesson.children = newNode.children;
-        Navigator.pop(context, list);
+        Navigator.pop(context, lesson);
       },
     );
   }

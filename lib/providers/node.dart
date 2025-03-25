@@ -56,9 +56,12 @@ class Node {
   /**
    * Clone this node
    */
-  Node clone() {
-    return Node(parent: parent, children: children, level: level)
-      ..values = values;
+  Node clone({Node? overrideParent}) {
+    return Node(
+      parent: overrideParent ?? parent,
+      children: children,
+      level: level,
+    )..values = values;
   }
 
   /**

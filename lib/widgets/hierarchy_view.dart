@@ -100,9 +100,13 @@ class _HierarchyViewState extends State<HierarchyView> {
             }),
             _nodeButton(Icons.save, () {
               if (nodeController.value == null) return;
-              if (nodeController.value!.level != NodeLevel.lesson) return;
-              final json = nodeController.value!.toJson();
-              final list = nodeController.value!.parent!;
+              final lesson = _treeController!.roots.first;
+              if (lesson.level != NodeLevel.lesson) {
+                print("Lesson not found!");
+                return;
+              }
+              final json = lesson.toJson();
+              final list = lesson.parent!;
               json["categoryId"] = list.id;
               json["categoryTitles"] = list.values["titles"];
               json["categorySubtitles"] = list.values["subtitles"];
