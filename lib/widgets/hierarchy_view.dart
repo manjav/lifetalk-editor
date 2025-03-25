@@ -88,6 +88,7 @@ class _HierarchyViewState extends State<HierarchyView> {
                 context: context,
                 builder: (context) => ListsPage(),
               );
+              if (result == null) return;
 
               roots.clear();
               roots.add(result);
