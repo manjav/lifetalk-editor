@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:lifetalk_editor/managers/net_connector.dart';
 import 'package:lifetalk_editor/managers/service_locator.dart';
+import 'package:lifetalk_editor/providers/content.dart';
 import 'package:lifetalk_editor/providers/node.dart';
 
 class ListsPage extends StatefulWidget {
@@ -12,6 +15,7 @@ class ListsPage extends StatefulWidget {
 
 class _ListsPageState extends State<ListsPage> {
   List<Node> _lists = [];
+  Map<String, Node> _updatedLessons = {};
 
   @override
   void initState() {
@@ -20,10 +24,26 @@ class _ListsPageState extends State<ListsPage> {
   }
 
   Future<void> _loadLists() async {
-    var lists = await serviceLocator<NetConnector>().loadLists();
-    for (var list in lists) {
+    var listMap = await serviceLocator<NetConnector>().loadLists();
+    var contents = Content.createLists(listMap);
+    _updatedLessons = <String, Node>{};
+    for (var list in listMap.entries) {
+      for (var e in list.value["groups"].entries) {
+        if (!e.value.containsKey("children")) continue;
+        var node = Node.fromDBJson(e.value, level: NodeLevel.lesson);
+        _updatedLessons[e.key] = node;
+      }
+    }
+
+    for (var list in contents) {
       var json = list.toJson();
       var node = Node.fromDBJson(json, level: NodeLevel.category);
+      for (var i = 0; i < node.children!.length; i++) {
+        final id = node.children![i].id;
+        if (_updatedLessons.containsKey(id)) {
+          node.children![i] = _updatedLessons[id]!;
+        }
+      }
       _lists.add(node);
     }
     setState(() {});
@@ -31,9 +51,28 @@ class _ListsPageState extends State<ListsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return Column(
+      children: [
+        Container(
+          color: Theme.of(context).colorScheme.surface,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("  Lessons", style: TextStyle(fontSize: 14)),
+              IconButton(
+                icon: Icon(Icons.close, size: 18),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
       itemCount: _lists.length,
       itemBuilder: (_, index) => _itemBuilder(_lists[index]),
+          ),
+        ),
+      ],
     );
   }
 
