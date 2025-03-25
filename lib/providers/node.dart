@@ -109,6 +109,21 @@ class Node {
     }
     return node;
   }
+
+  /**
+ * Find media of current serie
+ */
+  String findMediaSerie() {
+    if (!values.containsKey("media")) {
+      if (parent == null) return "";
+      return parent!.findMediaSerie();
+    }
+    String media = values["media"] ?? "";
+    if (media.contains("*")) {
+      media = media.split("*")[0];
+    }
+    return media;
+  }
 }
 
 /** 
@@ -155,8 +170,13 @@ enum NodeLevel {
         "subtitles": Map,
         "iconUrl": String,
       },
-      NodeLevel.serie => {"media": String},
-      NodeLevel.end => {"type": NodeType, "range": String, "locales": Map},
+      NodeLevel.serie => {"id": String, "media": String},
+      NodeLevel.end => {
+        "id": String,
+        "type": NodeType,
+        "range": String,
+        "locales": Map,
+      },
       _ => {},
     };
   }

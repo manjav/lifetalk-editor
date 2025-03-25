@@ -18,14 +18,12 @@ class _InspectorViewState extends State<InspectorView> {
       valueListenable: NodeController.of(context)!,
       builder: (context, value, child) {
         if (value == null) return SizedBox();
-        String video = value.values["media"] ?? "";
-        if (video.contains("*")) {
-          video = video.split("*")[0];
-        }
-        final videoController = YoutubePlayerController.of(context)!;
-        if (video.isNotEmpty &&
-            videoController.value.metaData.videoId != video) {
-          Future.microtask(() => videoController.load(video));
+        var media = value.findMediaSerie();
+        if (media.isNotEmpty) {
+          final videoController = YoutubePlayerController.of(context)!;
+          if (videoController.value.metaData.videoId != media) {
+            Future.microtask(() => videoController.load(media));
+          }
         }
         return Column(
           children: _rowsBuilder(value),
