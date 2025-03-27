@@ -3,7 +3,7 @@ import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:lifetalk_editor/managers/net_connector.dart';
 import 'package:lifetalk_editor/managers/service_locator.dart';
 import 'package:lifetalk_editor/pages/lists.dart';
-import 'package:lifetalk_editor/providers/node.dart';
+import 'package:lifetalk_editor/providers/fork.dart';
 import 'package:lifetalk_editor/theme/theme.dart';
 
 class HierarchyView extends StatefulWidget {
@@ -14,14 +14,14 @@ class HierarchyView extends StatefulWidget {
 }
 
 class _HierarchyViewState extends State<HierarchyView> {
-  List<Node> roots = [Node()];
-  TreeController<Node>? _treeController;
+  List<Fork> roots = [Fork()];
+  TreeController<Fork>? _treeController;
 
   @override
   void initState() {
-    _treeController = TreeController<Node>(
+    _treeController = TreeController<Fork>(
       roots: roots,
-      childrenProvider: (Node node) => node.children ?? [],
+      childrenProvider: (Fork fork) => fork.children ?? [],
     );
     _treeController!.toggleExpansion(roots.first);
     super.initState();
@@ -30,13 +30,13 @@ class _HierarchyViewState extends State<HierarchyView> {
   @override
   Widget build(BuildContext context) {
     if (_treeController == null) return SizedBox();
-    final nodeController = NodeController.of(context)!;
+    final nodeController = ForkController.of(context)!;
     return Row(
       children: [
         Expanded(
-          child: AnimatedTreeView<Node>(
+          child: AnimatedTreeView<Fork>(
             treeController: _treeController!,
-            nodeBuilder: (BuildContext context, TreeEntry<Node> entry) {
+            nodeBuilder: (BuildContext context, TreeEntry<Fork> entry) {
               var text = entry.node.level.name;
               if (entry.node.values.isNotEmpty) {
                 text += " [${entry.node.values.keys.join(", ")}]";
@@ -63,20 +63,20 @@ class _HierarchyViewState extends State<HierarchyView> {
         Column(
           children: [
             _nodeButton(Icons.add, () {
-              final node = nodeController.value!;
-              if (node.level == NodeLevel.end) {
+              final fork = nodeController.value!;
+              if (fork.level == ForkLevel.end) {
                 return;
               }
-              if (node.children == null) {
-                node.children = [];
+              if (fork.children == null) {
+                fork.children = [];
               }
-              var newNode = Node(parent: node);
-              if (node.level == NodeLevel.slide) {
+              var newNode = Fork(parent: fork);
+              if (fork.level == ForkLevel.slide) {
                 newNode.values["locales"] = {};
               }
-              node.children?.add(newNode);
+              fork.children?.add(newNode);
               _treeController!.rebuild();
-              _treeController!.expand(node);
+              _treeController!.expand(fork);
             }),
             _nodeButton(Icons.delete, () {
               nodeController.value!.delete();
@@ -92,9 +92,9 @@ class _HierarchyViewState extends State<HierarchyView> {
 
               roots.clear();
               roots.add(result);
-              _treeController = TreeController<Node>(
+              _treeController = TreeController<Fork>(
                 roots: roots,
-                childrenProvider: (Node node) => node.children ?? [],
+                childrenProvider: (Fork fork) => fork.children ?? [],
               );
               _treeController?.expandAll();
               setState(() {});
@@ -102,7 +102,7 @@ class _HierarchyViewState extends State<HierarchyView> {
             _nodeButton(Icons.save, () {
               if (nodeController.value == null) return;
               final lesson = _treeController!.roots.first;
-              if (lesson.level != NodeLevel.lesson) {
+              if (lesson.level != ForkLevel.lesson) {
                 print("Lesson not found!");
                 return;
               }

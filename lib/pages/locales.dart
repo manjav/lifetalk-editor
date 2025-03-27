@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:lifetalk_editor/providers/node.dart';
+import 'package:lifetalk_editor/providers/fork.dart';
 import 'package:lifetalk_editor/utils/extension.dart';
 
 class LocalesWidget extends StatelessWidget {
-  final Node node;
+  final Fork fork;
   final String name;
-  LocalesWidget(this.node, this.name, {super.key});
+  LocalesWidget(this.fork, this.name, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +33,8 @@ class LocalesWidget extends StatelessWidget {
               child: StatefulBuilder(
                 builder: (context, setState) {
                   final values =
-                      Node.localeNames
-                          .map((e) => MapEntry(e, node.values[name][e] ?? ""))
+                      Fork.localeNames
+                          .map((e) => MapEntry(e, fork.values[name][e] ?? ""))
                           .toList();
 
                   return ListView.builder(
@@ -52,10 +52,10 @@ class LocalesWidget extends StatelessWidget {
                               textDirection: text.getDirection(),
                               controller: TextEditingController(text: text),
                               onSubmitted: (text) {
-                                node.values[name][localeName] = text;
-                                var newNode = node.clone();
+                                fork.values[name][localeName] = text;
+                                var newFork = fork.clone();
                                 setState(() {});
-                                NodeController.of(context)!.value = newNode;
+                                ForkController.of(context)!.value = newFork;
                               },
                             ),
                           ),
@@ -75,9 +75,9 @@ class LocalesWidget extends StatelessWidget {
 
 // ignore: must_be_immutable
 class LocaleButton extends StatelessWidget {
-  Node node;
+  Fork fork;
   String name;
-  LocaleButton(this.node, this.name, {super.key});
+  LocaleButton(this.fork, this.name, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -85,10 +85,10 @@ class LocaleButton extends StatelessWidget {
       onPressed: () async {
         await showDialog(
           context: context,
-          builder: (context) => LocalesWidget(node, name),
+          builder: (context) => LocalesWidget(fork, name),
         );
       },
-      child: Text(node.values[name]?["en"] ?? ""),
+      child: Text(fork.values[name]?["en"] ?? ""),
     );
   }
 }

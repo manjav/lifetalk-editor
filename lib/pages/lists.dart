@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lifetalk_editor/managers/net_connector.dart';
 import 'package:lifetalk_editor/managers/service_locator.dart';
 import 'package:lifetalk_editor/providers/content.dart';
-import 'package:lifetalk_editor/providers/node.dart';
+import 'package:lifetalk_editor/providers/fork.dart';
 
 class ListsPage extends StatefulWidget {
   const ListsPage({super.key});
@@ -14,8 +14,8 @@ class ListsPage extends StatefulWidget {
 }
 
 class _ListsPageState extends State<ListsPage> {
-  List<Node> _lists = [];
-  Map<String, Node> _updatedLessons = {};
+  List<Fork> _lists = [];
+  Map<String, Fork> _updatedLessons = {};
 
   @override
   void initState() {
@@ -26,25 +26,25 @@ class _ListsPageState extends State<ListsPage> {
   Future<void> _loadLists() async {
     var listMap = await serviceLocator<NetConnector>().loadLists();
     var contents = Content.createLists(listMap);
-    _updatedLessons = <String, Node>{};
+    _updatedLessons = <String, Fork>{};
     for (var list in listMap.entries) {
       for (var e in list.value["groups"].entries) {
         if (!e.value.containsKey("children")) continue;
-        var node = Node.fromDBJson(e.value, level: NodeLevel.lesson);
-        _updatedLessons[e.key] = node;
+        var fork = Fork.fromDBJson(e.value, level: ForkLevel.lesson);
+        _updatedLessons[e.key] = fork;
       }
     }
 
     for (var list in contents) {
       var json = list.toJson();
-      var node = Node.fromDBJson(json, level: NodeLevel.category);
-      for (var i = 0; i < node.children!.length; i++) {
-        final id = node.children![i].id;
+      var fork = Fork.fromDBJson(json, level: ForkLevel.category);
+      for (var i = 0; i < fork.children!.length; i++) {
+        final id = fork.children![i].id;
         if (_updatedLessons.containsKey(id)) {
-          node.children![i] = _updatedLessons[id]!.clone(overrideParent: node);
+          fork.children![i] = _updatedLessons[id]!.clone(overrideParent: fork);
         }
       }
-      _lists.add(node);
+      _lists.add(fork);
     }
     setState(() {});
   }
@@ -76,7 +76,7 @@ class _ListsPageState extends State<ListsPage> {
     );
   }
 
-  Widget _itemBuilder(Node list) {
+  Widget _itemBuilder(Fork list) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10),
       alignment: Alignment.centerLeft,
@@ -101,7 +101,7 @@ class _ListsPageState extends State<ListsPage> {
     );
   }
 
-  Widget _buttonBuilder(Node list, Node lesson) {
+  Widget _buttonBuilder(Fork list, Fork lesson) {
     String lessonTitle =
         lesson.values["titles"].length > 0
             ? lesson.values["titles"]["en"]
@@ -138,7 +138,7 @@ class _ListsPageState extends State<ListsPage> {
           lesson.id,
           lesson.values,
         );
-        var newNode = Node.fromDBJson(group.toJson());
+        var newNode = Fork.fromDBJson(group.toJson());
         lesson.children = newNode.children;
         Navigator.pop(context, lesson);
       },

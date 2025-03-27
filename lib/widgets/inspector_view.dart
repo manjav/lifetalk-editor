@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lifetalk_editor/pages/locales.dart';
-import 'package:lifetalk_editor/providers/node.dart';
+import 'package:lifetalk_editor/providers/fork.dart';
 import 'package:lifetalk_editor/utils/extension.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -15,7 +15,7 @@ class _InspectorViewState extends State<InspectorView> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: NodeController.of(context)!,
+      valueListenable: ForkController.of(context)!,
       builder: (context, value, child) {
         if (value == null) return SizedBox();
         var media = value.findMediaSerie();
@@ -33,41 +33,40 @@ class _InspectorViewState extends State<InspectorView> {
     );
   }
 
-  List<Widget> _rowsBuilder(Node node) {
+  List<Widget> _rowsBuilder(Fork fork) {
     var children = <Widget>[];
-    for (var entry in node.level.elemets.entries) {
+    for (var entry in fork.level.elemets.entries) {
       children.add(
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10),
-          child: _rowBuilder(node, entry.key, entry.value),
+          child: _rowBuilder(fork, entry.key, entry.value),
         ),
       );
     }
     return children;
   }
 
-  Widget _rowBuilder(Node node, String key, Type type) {
+  Widget _rowBuilder(Fork fork, String key, Type type) {
     if (type == String) {
-      String text = node.values[key] ?? "";
+      String text = fork.values[key] ?? "";
       return _rowCreator(
         key,
         TextField(
           textDirection: text.getDirection(),
           controller: TextEditingController(text: text),
           onSubmitted: (text) {
-            node.values[key] = text;
-            // setState(() {});
+            fork.values[key] = text;
           },
         ),
       );
     }
 
-    if (type == NodeType) {
+    if (type == ForkType) {
       return _rowCreator(
         key,
         DropdownButton(
           items:
-              NodeType.values
+              ForkType.values
                   .map(
                     (e) => DropdownMenuItem(
                       value: e,
@@ -75,8 +74,8 @@ class _InspectorViewState extends State<InspectorView> {
                     ),
                   )
                   .toList(),
-          value: node.values[key] ?? NodeType.caption,
-          onChanged: (value) => _updateNode(node, key, value),
+          value: fork.values[key] ?? ForkType.caption,
+          onChanged: (value) => _updateNode(fork, key, value),
         ),
       );
     }
@@ -85,7 +84,7 @@ class _InspectorViewState extends State<InspectorView> {
     }
 
     if (type == Map) {
-      return _rowCreator(key, LocaleButton(node, key));
+      return _rowCreator(key, LocaleButton(fork, key));
     }
     return SizedBox();
   }
@@ -97,9 +96,9 @@ class _InspectorViewState extends State<InspectorView> {
     );
   }
 
-  void _updateNode(Node node, String key, Object? value) {
+  void _updateNode(Fork node, String key, Object? value) {
     var newNode = node.clone();
     newNode.values[key] = value;
-    NodeController.of(context)!.value = newNode;
+    ForkController.of(context)!.value = newNode;
   }
 }

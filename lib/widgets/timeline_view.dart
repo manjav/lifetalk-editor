@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:cart_stepper/cart_stepper.dart';
 import 'package:flutter/material.dart';
-import 'package:lifetalk_editor/providers/node.dart';
+import 'package:lifetalk_editor/providers/fork.dart';
 import 'package:lifetalk_editor/theme/theme.dart';
 import 'package:lifetalk_editor/utils/extension.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
@@ -18,7 +18,7 @@ class TimelineView extends StatefulWidget {
 
 class _TimelineViewState extends State<TimelineView> {
   int _scale = 1;
-  Node? _activeNode;
+  Fork? _activeNode;
   double _timelineSize = 1;
   bool _hasEndOfRangeChanged = false;
   final _scrollController = ScrollController();
@@ -33,7 +33,7 @@ class _TimelineViewState extends State<TimelineView> {
   @override
   Widget build(BuildContext context) {
     final videoController = YoutubePlayerController.of(context)!;
-    final nodeController = NodeController.of(context)!;
+    final nodeController = ForkController.of(context)!;
     _calculateSelecedRange(nodeController);
     return AnimatedBuilder(
       animation: Listenable.merge([videoController, nodeController]),
@@ -109,11 +109,11 @@ class _TimelineViewState extends State<TimelineView> {
                               trackShape: _TrackShape(),
                               onChangeEnd: (value) {
                                 _play();
-                                if (selectedNode.level != NodeLevel.end) return;
-                                var node = nodeController.value!.clone();
-                                node.values["range"] =
+                                if (selectedNode.level != ForkLevel.end) return;
+                                var fork = nodeController.value!.clone();
+                                fork.values["range"] =
                                     "${(value.start as double).toTime()}-${(value.end as double).toTime()}";
-                                nodeController.value = node;
+                                nodeController.value = fork;
                               },
                               onChanged: (SfRangeValues newValues) {
                                 _hasEndOfRangeChanged =
@@ -161,15 +161,15 @@ class _TimelineViewState extends State<TimelineView> {
     );
   }
 
-  void _calculateSelecedRange(ValueNotifier<Node?> selectedNode) {
+  void _calculateSelecedRange(ValueNotifier<Fork?> selectedNode) {
     selectedNode.addListener(() {
       if (selectedNode.value == null ||
           (_activeNode != null && _activeNode!.id == selectedNode.value!.id)) {
         return;
       }
-      var node = selectedNode.value;
-      if (node != null && node.values.containsKey("range")) {
-        List<String> ranges = node.values["range"].split("-");
+      var fork = selectedNode.value;
+      if (fork != null && fork.values.containsKey("range")) {
+        List<String> ranges = fork.values["range"].split("-");
         List<double> values = [];
         for (var range in ranges) {
           values.add(range.parseTime() * 1000);
@@ -177,7 +177,7 @@ class _TimelineViewState extends State<TimelineView> {
         _values = SfRangeValues(values[0], values[1]);
         _hasEndOfRangeChanged = false;
         _play();
-        _activeNode = node;
+        _activeNode = fork;
       }
     });
   }

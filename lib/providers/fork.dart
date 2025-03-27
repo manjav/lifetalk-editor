@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Node {
+class Fork {
   static const localeNames = [
     "en",
     "es",
@@ -19,14 +19,14 @@ class Node {
     "zh",
     "ar",
   ];
-  final Node? parent;
-  List<Node>? children;
-  NodeLevel level = NodeLevel.lesson;
+  final Fork? parent;
+  List<Fork>? children;
+  ForkLevel level = ForkLevel.lesson;
   Map<String, dynamic> values = {};
-  Node({this.parent, this.children, this.level = NodeLevel.category});
+  Fork({this.parent, this.children, this.level = ForkLevel.category});
 
   /**
-   * Returns the index of this node in its parent
+   * Returns the index of this fork in its parent
    */
   int get index {
     if (values.containsKey("index")) {
@@ -36,7 +36,7 @@ class Node {
   }
 
   /**
-   * Returns the id of this node
+   * Returns the id of this fork
    */
   String get id {
     if (values.containsKey("id")) {
@@ -49,15 +49,15 @@ class Node {
   }
 
   /**
-   * Remove this node from its parent  
+   * Remove this fork from its parent  
    */
   void delete() => parent?.children?.remove(this);
 
   /**
-   * Clone this node
+   * Clone this fork
    */
-  Node clone({Node? overrideParent}) {
-    return Node(
+  Fork clone({Fork? overrideParent}) {
+    return Fork(
       parent: overrideParent ?? parent,
       children: children,
       level: level,
@@ -65,7 +65,7 @@ class Node {
   }
 
   /**
-   * Convert this node to json
+   * Convert this fork to json
    */
   Map toJson() {
     var json = <String, dynamic>{};
@@ -84,33 +84,33 @@ class Node {
     return json;
   }
 
-  static Node fromDBJson(
+  static Fork fromDBJson(
     Map<String, dynamic> map, {
-    Node? parent,
-    NodeLevel level = NodeLevel.lesson,
+    Fork? parent,
+    ForkLevel level = ForkLevel.lesson,
   }) {
-    var node = Node(parent: parent, level: level);
+    var fork = Fork(parent: parent, level: level);
     for (var entry in map.entries) {
       if (entry.key == "children") {
-        node.children =
+        fork.children =
             (entry.value as List)
                 .map(
-                  (e) => Node.fromDBJson(
+                  (e) => Fork.fromDBJson(
                     e,
-                    parent: node,
-                    level: node.level.childLevel!,
+                    parent: fork,
+                    level: fork.level.childLevel!,
                   ),
                 )
                 .toList();
       } else {
         if (entry.key == "type") {
-          node.values[entry.key] = NodeType.valuesByName(entry.value);
+          fork.values[entry.key] = ForkType.valuesByName(entry.value);
         } else {
-          node.values[entry.key] = entry.value;
+          fork.values[entry.key] = entry.value;
         }
       }
     }
-    return node;
+    return fork;
   }
 
   /**
@@ -130,9 +130,9 @@ class Node {
 }
 
 /** 
- *  Returns the level of this node
+ *  Returns the level of this fork
  */
-enum NodeLevel {
+enum ForkLevel {
   category,
   lesson,
   serie,
@@ -140,43 +140,43 @@ enum NodeLevel {
   end;
 
   /**
- * Returns the child level of this node
+ * Returns the child level of this fork
  */
-  NodeLevel? get childLevel {
-    final values = NodeLevel.values;
+  ForkLevel? get childLevel {
+    final values = ForkLevel.values;
     return index >= values.length - 1 ? null : values[index + 1];
   }
 
   /**
- * Returns the parent level of this node
+ * Returns the parent level of this fork
  */
-  NodeLevel? get parentLevel {
-    final values = NodeLevel.values;
+  ForkLevel? get parentLevel {
+    final values = ForkLevel.values;
     return index <= 1 ? null : values[index - 1];
   }
 
   /**
- * Returns the elements of this node level
+ * Returns the elements of this fork level
  */
   Map<String, Type> get elemets {
     return switch (this) {
-      NodeLevel.category => {
+      ForkLevel.category => {
         "id": String,
         "titles": Map,
         "subtitles": Map,
         "iconUrl": String,
       },
-      NodeLevel.lesson => {
+      ForkLevel.lesson => {
         "id": String,
         "mode": LessonMode,
         "titles": Map,
         "subtitles": Map,
         "iconUrl": String,
       },
-      NodeLevel.serie => {"id": String, "media": String},
-      NodeLevel.end => {
+      ForkLevel.serie => {"id": String, "media": String},
+      ForkLevel.end => {
         "id": String,
-        "type": NodeType,
+        "type": ForkType,
         "range": String,
         "locales": Map,
       },
@@ -188,44 +188,44 @@ enum NodeLevel {
 /// The mode of a lesson
 enum LessonMode { imitation }
 
-/// The type of a node
-enum NodeType {
+/// The type of a fork
+enum ForkType {
   caption,
   repeat,
   station,
   wordBank;
 
-  static NodeType valuesByName(String name) =>
-      NodeType.values.firstWhere((element) => element.name == name);
+  static ForkType valuesByName(String name) =>
+      ForkType.values.firstWhere((element) => element.name == name);
 }
 
-/// A widget that exposes a [NodeController] to its descendants.
-class NodeController extends InheritedWidget {
-  const NodeController({
+/// A widget that exposes a [ForkController] to its descendants.
+class ForkController extends InheritedWidget {
+  const ForkController({
     super.key,
     required this.notifier,
     required super.child,
   });
 
-  /// The node that this widget is exposing.
-  final ValueNotifier<Node?> notifier;
+  /// The fork that this widget is exposing.
+  final ValueNotifier<Fork?> notifier;
 
-  /// Returns the node closest to the given context, if any.
-  static ValueNotifier<Node?>? maybeOf(BuildContext context) {
+  /// Returns the fork closest to the given context, if any.
+  static ValueNotifier<Fork?>? maybeOf(BuildContext context) {
     return context
-        .dependOnInheritedWidgetOfExactType<NodeController>()
+        .dependOnInheritedWidgetOfExactType<ForkController>()
         ?.notifier;
   }
 
-  /// Returns the node closest to the given context.
-  static ValueNotifier<Node?>? of(BuildContext context) {
+  /// Returns the fork closest to the given context.
+  static ValueNotifier<Fork?>? of(BuildContext context) {
     final result = maybeOf(context);
-    assert(result != null, 'No node found in context');
+    assert(result != null, 'No fork found in context');
     return result!;
   }
 
-  /// Whether the exposed node has changed.
+  /// Whether the exposed fork has changed.
   @override
-  bool updateShouldNotify(NodeController oldWidget) =>
+  bool updateShouldNotify(ForkController oldWidget) =>
       notifier != oldWidget.notifier;
 }
