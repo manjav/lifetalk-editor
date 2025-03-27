@@ -5,25 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:intl/intl.dart' show DateFormat, NumberFormat;
 
-extension NumExtension on num {
-  // String toTime({String separator = ":"}) {
-  //   int hours = (this ~/ 3600);
-  //   int mins = ((this % 3600) ~/ 60);
-  //   int secs = (this % 60).toInt();
-  //   int millis = int.parse(toString().split(".").last);
-  //   // int millis = ((this - floor()) * 1000).toInt();
-
-  //   String hoursStr = hours > 0 ? "$hours$separator" : "";
-  //   // String minsStr = hours > 0 || mins > 0 ? "$min$separator" : "0";
-  //   String millisStr = millis > 0 ? ".$millis" : "";
-
-  //   return "$hoursStr$mins$separator$secs$millisStr";
-  // }
-
+extension DoubleeExtension on double {
   String toTime([String newPattern = "H:m:s.SS", String? locale]) {
-    var pattern = DateFormat(
-      newPattern,
-    ).format(DateTime.utc(0, 0, 0, 0, 0, 0, 0, (this * 1000).toInt()));
+    var date = DateTime.utc(0, 1, 1, 0, 0, 0, 0, 0);
+    date = date.add(Duration(milliseconds: (this * 1000).round()));
+    var pattern = DateFormat(newPattern).format(date);
     if (pattern.startsWith("0:")) {
       pattern = pattern.substring(2, pattern.length - 1);
     }
