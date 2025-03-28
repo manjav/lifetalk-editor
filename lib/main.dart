@@ -12,6 +12,7 @@ import 'package:lifetalk_editor/managers/service_locator.dart';
 import 'package:lifetalk_editor/providers/fork.dart';
 import 'package:lifetalk_editor/router.dart';
 import 'package:lifetalk_editor/theme/theme.dart';
+import 'package:window_manager/window_manager.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class MyHttpOverrides extends HttpOverrides {
@@ -30,6 +31,8 @@ void main() async {
 
   await Prefs().initialize();
   initServices();
+  await windowManager.ensureInitialized();
+  windowManager.setSize(Size(1200, 1000));
   runApp(const LifeTalkEditor());
 }
 
