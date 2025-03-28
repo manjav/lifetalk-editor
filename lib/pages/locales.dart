@@ -34,7 +34,7 @@ class LocalesWidget extends StatelessWidget {
                 builder: (context, setState) {
                   final values =
                       Fork.localeNames
-                          .map((e) => MapEntry(e, fork.values[name][e] ?? ""))
+                          .map((e) => MapEntry(e, fork.values[name]?[e] ?? ""))
                           .toList();
 
                   return ListView.builder(
@@ -52,6 +52,9 @@ class LocalesWidget extends StatelessWidget {
                               textDirection: text.getDirection(),
                               controller: TextEditingController(text: text),
                               onSubmitted: (text) {
+                                if (!fork.values.containsKey(name)) {
+                                  fork.values[name] = {};
+                                }
                                 fork.values[name][localeName] = text;
                                 var newFork = fork.clone();
                                 setState(() {});
