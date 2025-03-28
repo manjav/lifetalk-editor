@@ -25,9 +25,7 @@ class Fork {
   Map<String, dynamic> values = {};
   Fork({this.parent, this.children, this.level = ForkLevel.category});
 
-  /**
-   * Returns the index of this fork in its parent
-   */
+  /// Returns the index of this fork in its parent
   int get index {
     if (values.containsKey("index")) {
       return values["index"];
@@ -35,9 +33,7 @@ class Fork {
     return parent == null ? 0 : parent!.children!.indexOf(this);
   }
 
-  /**
-   * Returns the id of this fork
-   */
+  /// Returns the id of this fork
   String get id {
     if (values.containsKey("id")) {
       return values["id"];
@@ -48,25 +44,22 @@ class Fork {
     return "${parent!.id}_$index";
   }
 
-  /**
-   * Remove this fork from its parent  
-   */
+  /// Returns the type of this fork
+  ForkType get type => values["type"];
+
+  /// Remove this fork from its parent
   void delete() => parent?.children?.remove(this);
 
-  /**
-   * Clone this fork
-   */
+  /// Clone this fork
   Fork clone({Fork? overrideParent}) {
-    return Fork(
+    var fork = Fork(
       parent: overrideParent ?? parent,
       children: children,
       level: level,
     )..values = values;
   }
 
-  /**
-   * Convert this fork to json
-   */
+  /// Convert this fork to json
   Map toJson() {
     var json = <String, dynamic>{};
     if (children != null) {
@@ -113,9 +106,7 @@ class Fork {
     return fork;
   }
 
-  /**
- * Find media of current serie
- */
+  /// Find media of current serie
   String findMediaSerie() {
     if (!values.containsKey("media")) {
       if (parent == null) return "";
@@ -129,9 +120,7 @@ class Fork {
   }
 }
 
-/** 
- *  Returns the level of this fork
- */
+///  Returns the level of this fork
 enum ForkLevel {
   category,
   lesson,
@@ -139,25 +128,19 @@ enum ForkLevel {
   slide,
   end;
 
-  /**
- * Returns the child level of this fork
- */
+  /// Returns the child level of this fork
   ForkLevel? get childLevel {
     final values = ForkLevel.values;
     return index >= values.length - 1 ? null : values[index + 1];
   }
 
-  /**
- * Returns the parent level of this fork
- */
+  /// Returns the parent level of this fork
   ForkLevel? get parentLevel {
     final values = ForkLevel.values;
     return index <= 1 ? null : values[index - 1];
   }
 
-  /**
- * Returns the elements of this fork level
- */
+  /// Returns the elements of this fork level
   Map<String, Type> get elemets {
     return switch (this) {
       ForkLevel.category => {
