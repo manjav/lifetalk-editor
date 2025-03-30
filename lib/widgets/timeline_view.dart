@@ -109,11 +109,17 @@ class _TimelineViewState extends State<TimelineView> {
                               trackShape: _TrackShape(),
                               onChangeEnd: (value) {
                                 _play();
-                                if (selectedNode.level != ForkLevel.end) return;
-                                var fork = nodeController.value!.clone();
-                                fork.values["range"] =
-                                    "${(value.start as double).toTime()}-${(value.end as double).toTime()}";
-                                nodeController.value = fork;
+                                var ranges =
+                                    "${(value.start as double).toTime(leverage: 1)}-${(value.end as double).toTime(leverage: 1)}";
+                                var fork = nodeController.value!;
+                                if (fork.level == ForkLevel.serie) {
+                                  fork.values["media"] =
+                                      "${videoController.value.metaData.videoId}*${ranges}";
+                                  nodeController.value = fork;
+                                } else if (fork.level == ForkLevel.end) {
+                                  fork.values["range"] = ranges;
+                                  nodeController.value = fork;
+                                }
                               },
                               onChanged: (SfRangeValues newValues) {
                                 _hasEndOfRangeChanged =
@@ -168,16 +174,24 @@ class _TimelineViewState extends State<TimelineView> {
         return;
       }
       var fork = selectedNode.value;
-      if (fork != null && fork.values.containsKey("range")) {
-        List<String> ranges = fork.values["range"].split("-");
-        List<double> values = [];
-        for (var range in ranges) {
-          values.add(range.parseTime() * 1000);
+      if (fork != null) {
+        List<String> ranges = [];
+        if (fork.level == ForkLevel.serie) {
+          if ((fork.values["media"] ?? "") != "") {
+            ranges = fork.values["media"].split("*").last.split("-");
+          }
+        } else if (fork.level == ForkLevel.end) {
+          if ((fork.values["range"] ?? "") != "") {
+            ranges = fork.values["range"].split("-");
+          }
         }
-        _values = SfRangeValues(values[0], values[1]);
-        _hasEndOfRangeChanged = false;
-        _play();
-        _activeNode = fork;
+        if (ranges.length > 1) {
+          var values = ranges.map((String r) => r.parseTime() * 1000);
+          _values = SfRangeValues(values.first, values.last);
+          _hasEndOfRangeChanged = false;
+          _play();
+          _activeNode = fork;
+        }
       }
     });
   }
@@ -187,7 +201,7 @@ class _TimelineViewState extends State<TimelineView> {
   }
 
   void _play() {
-    var milis = _hasEndOfRangeChanged ? _values.end - 1000 : _values.start;
+    var milis = _hasEndOfRangeChanged ? _values.end - 500 : _values.start;
     YoutubePlayerController.of(
       context,
     )?.seekTo(Duration(milliseconds: (milis as double).round()));
