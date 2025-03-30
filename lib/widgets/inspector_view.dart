@@ -22,7 +22,10 @@ class _InspectorViewState extends State<InspectorView> {
         if (media.isNotEmpty) {
           final videoController = YoutubePlayerController.of(context)!;
           if (videoController.value.metaData.videoId != media) {
-            Future.microtask(() => videoController.load(media));
+            Future.delayed(
+              Duration(milliseconds: 222),
+              (() => videoController.load(media)),
+            );
           }
         }
         return Column(
@@ -88,7 +91,22 @@ class _InspectorViewState extends State<InspectorView> {
       );
     }
     if (type == LessonMode) {
-      return Text("Imitation");
+      return _rowCreator(
+        key,
+        DropdownButton(
+          items:
+              LessonMode.values
+                  .map(
+                    (e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(e.name.toPascalCase()),
+                    ),
+                  )
+                  .toList(),
+          value: fork.values[key] ?? LessonMode.imitation,
+          onChanged: (value) => _updateNode(fork, key, value),
+        ),
+      );
     }
 
     if (type == Map) {
@@ -105,8 +123,7 @@ class _InspectorViewState extends State<InspectorView> {
   }
 
   void _updateNode(Fork node, String key, Object? value) {
-    var newNode = node.clone();
-    newNode.values[key] = value;
-    ForkController.of(context)!.value = newNode;
+    node.values[key] = value;
+    ForkController.of(context)!.value = node.clone();
   }
 }

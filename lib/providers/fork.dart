@@ -66,9 +66,6 @@ class Fork {
   /// Convert this fork to json
   Map toJson() {
     var json = <String, dynamic>{};
-    if (children != null) {
-      json["children"] = children!.map((e) => e.toJson()).toList();
-    }
     if (values.isNotEmpty) {
       for (var entry in values.entries) {
         if (entry.value is Enum) {
@@ -78,11 +75,23 @@ class Fork {
         }
       }
     }
+    if (json.containsKey("iconUrl") && !json["iconUrl"].contains("https")) {
+      json["iconUrl"] =
+          "https://8ball.turnedondigital.com/lifetalk/images/lesson_${json["iconUrl"]}.webp";
+    }
+    if (!json.containsKey("id")) {
+      json["id"] = id;
+    }
 
     if (level == ForkLevel.lesson) {
       if (json.containsKey("index")) {
         json["index"] = index;
       }
+    }
+
+    // Recursive children
+    if (children != null) {
+      json["children"] = children!.map((e) => e.toJson()).toList();
     }
     return json;
   }
@@ -108,6 +117,8 @@ class Fork {
       } else {
         if (entry.key == "type") {
           fork.values[entry.key] = ForkType.valuesByName(entry.value);
+        } else if (entry.key == "mode") {
+          fork.values[entry.key] = LessonMode.valuesByName(entry.value);
         } else {
           fork.values[entry.key] = entry.value;
         }
@@ -116,15 +127,20 @@ class Fork {
     return fork;
   }
 
+  /// Find fork by level
+  Fork? findByLevel(ForkLevel level) {
+    if (this.level == level) return this;
+    if (parent == null) return null;
+    return parent!.findByLevel(level);
+  }
+
   /// Find media of current serie
   String findMediaSerie() {
-    if (!values.containsKey("media")) {
-      if (parent == null) return "";
-      return parent!.findMediaSerie();
-    }
-    String media = values["media"] ?? "";
+    var serie = findByLevel(ForkLevel.serie);
+    if (serie == null) return "";
+    String media = serie.values["media"] ?? "";
     if (media.contains("*")) {
-      media = media.split("*")[0];
+      media = media.split("*").first;
     }
     return media;
   }
@@ -167,7 +183,7 @@ enum ForkLevel {
         "subtitles": Map,
         "iconUrl": String,
       },
-      ForkLevel.serie => {"id": String, "media": String},
+      ForkLevel.serie => {"media": String},
       ForkLevel.end => {
         "id": String,
         "type": ForkType,
@@ -180,14 +196,33 @@ enum ForkLevel {
 }
 
 /// The mode of a lesson
-enum LessonMode { imitation }
+enum LessonMode {
+  none,
+  imitation;
+
+  static LessonMode valuesByName(String name) => LessonMode.values.firstWhere(
+    (element) => element.name == name,
+    orElse: () => LessonMode.imitation,
+  );
+}
 
 /// The type of a fork
 enum ForkType {
   caption,
   repeat,
+  wordBank,
   station,
-  wordBank;
+  translate,
+  answer;
+
+  bool get isQuiz =>
+      this == ForkType.repeat ||
+      this == ForkType.translate ||
+      this == ForkType.wordBank ||
+      this == ForkType.answer;
+  // this == ForkType.dictation ||
+  // this == ForkType.match ||
+  // this == ForkType.choices;
 
   static ForkType valuesByName(String name) =>
       ForkType.values.firstWhere((element) => element.name == name);
