@@ -70,16 +70,13 @@ class _HierarchyViewState extends State<HierarchyView> {
               if (fork.children == null) {
                 fork.children = [];
               }
-              var newNode = Fork(parent: fork);
-              if (fork.level == ForkLevel.slide) {
-                newNode.values["locales"] = {};
-              }
+              var newNode = Fork(parent: fork, level: fork.level.childLevel!);
               fork.children?.add(newNode);
               _treeController!.rebuild();
               _treeController!.expand(fork);
             }),
             _nodeButton(Icons.delete, () {
-              nodeController.value!.delete();
+              nodeController.value?.delete();
               nodeController.value = null;
               _treeController!.rebuild();
             }),
@@ -89,9 +86,10 @@ class _HierarchyViewState extends State<HierarchyView> {
                 builder: (context) => ListsPage(),
               );
               if (result == null) return;
-
+              var list = Fork()..values = result.parent!.values;
+              list.children = [result.clone(overrideParent: list)];
               roots.clear();
-              roots.add(result);
+              roots.add(list);
               _treeController = TreeController<Fork>(
                 roots: roots,
                 childrenProvider: (Fork fork) => fork.children ?? [],
@@ -101,16 +99,12 @@ class _HierarchyViewState extends State<HierarchyView> {
             }),
             _nodeButton(Icons.save, () {
               if (nodeController.value == null) return;
-              final lesson = _treeController!.roots.first;
-              if (lesson.level != ForkLevel.lesson) {
+              final list = _treeController!.roots.first;
+              if (list.level != ForkLevel.category) {
                 print("Lesson not found!");
                 return;
               }
-              final json = lesson.toJson();
-              final list = lesson.parent!;
-              json["categoryId"] = list.id;
-              json["categoryTitles"] = list.values["titles"];
-              json["categorySubtitles"] = list.values["subtitles"];
+              final json = list.toJson();
               serviceLocator<NetConnector>().rpc(
                 "content_group_set",
                 params: json,
