@@ -134,6 +134,8 @@ class _ListsPageState extends State<ListsPage> {
           Expanded(child: SizedBox()),
           IconButton(
             onPressed: () async {
+              var result = await _showDeleteAlert();
+              if (result == null) return;
               await serviceLocator<NetConnector>().rpc(
                 "content_groups_delete",
                 params: {"id": lesson.id},
@@ -158,6 +160,39 @@ class _ListsPageState extends State<ListsPage> {
         var newNode = Fork.fromDBJson(group.toJson());
         lesson.children = newNode.children;
         Navigator.pop(context, lesson);
+      },
+    );
+  }
+
+  Future<dynamic> _showDeleteAlert() async {
+    return await showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Alert!'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to delete this lesson?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Approve'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+            TextButton(
+              child: const Text('Decline'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
       },
     );
   }
