@@ -56,7 +56,11 @@ class Fork {
       parent: overrideParent ?? parent,
       children: children,
       level: level,
-    )..values = values;
+    );
+    for (var e in values.entries) {
+      fork.values[e.key] = e.value;
+    }
+    return fork;
   }
 
   /// Convert this fork to json
