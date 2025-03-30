@@ -131,6 +131,17 @@ class _ListsPageState extends State<ListsPage> {
           Text(lesson.id),
           Text(lessonTitle),
           Text(lessonSubtitle, style: TextStyle(color: Colors.grey)),
+          Expanded(child: SizedBox()),
+          IconButton(
+            onPressed: () async {
+              await serviceLocator<NetConnector>().rpc(
+                "content_groups_delete",
+                params: {"id": lesson.id},
+              );
+              await _loadLists();
+            },
+            icon: Icon(Icons.delete),
+          ),
         ],
       ),
       onPressed: () async {

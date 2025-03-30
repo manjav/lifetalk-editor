@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:lifetalk_editor/providers/fork.dart';
 import 'package:lifetalk_editor/utils/extension.dart';
 
-class LocalesWidget extends StatelessWidget {
+class LocalesWidget extends StatefulWidget {
   final Fork fork;
   final String name;
   LocalesWidget(this.fork, this.name, {super.key});
 
+  @override
+  State<LocalesWidget> createState() => _LocalesWidgetState();
+}
+
+class _LocalesWidgetState extends State<LocalesWidget> {
   @override
   Widget build(BuildContext context) {
     var updated = false;
@@ -18,9 +23,16 @@ class LocalesWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(name.toPascalCase(), style: TextStyle(fontSize: 14)),
+                Text(
+                  widget.name.toPascalCase(),
+                  style: TextStyle(fontSize: 14),
+                ),
+                Expanded(child: SizedBox()),
+                IconButton(
+                  icon: Icon(Icons.dynamic_feed_sharp, size: 18),
+                  onPressed: () => _sameFill(context),
+                ),
                 IconButton(
                   icon: Icon(Icons.close, size: 18),
                   onPressed: () => Navigator.pop(context, updated),
@@ -34,7 +46,12 @@ class LocalesWidget extends StatelessWidget {
                 builder: (context, setState) {
                   final values =
                       Fork.localeNames
-                          .map((e) => MapEntry(e, fork.values[name]?[e] ?? ""))
+                          .map(
+                            (e) => MapEntry(
+                              e,
+                              widget.fork.values[widget.name]?[e] ?? "",
+                            ),
+                          )
                           .toList();
 
                   return ListView.builder(
@@ -52,11 +69,14 @@ class LocalesWidget extends StatelessWidget {
                               textDirection: text.getDirection(),
                               controller: TextEditingController(text: text),
                               onSubmitted: (text) {
-                                if (!fork.values.containsKey(name)) {
-                                  fork.values[name] = {};
+                                if (!widget.fork.values.containsKey(
+                                  widget.name,
+                                )) {
+                                  widget.fork.values[widget.name] = {};
                                 }
-                                fork.values[name][localeName] = text;
-                                var newFork = fork.clone();
+                                widget.fork.values[widget.name][localeName] =
+                                    text;
+                                var newFork = widget.fork.clone();
                                 setState(() {});
                                 ForkController.of(context)!.value = newFork;
                               },
@@ -73,6 +93,16 @@ class LocalesWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _sameFill(BuildContext context) {
+    for (var code in Fork.localeNames) {
+      if (code == "en") continue;
+      widget.fork.values[widget.name][code] =
+          widget.fork.values[widget.name]["en"];
+    }
+    ForkController.of(context)!.value = widget.fork.clone();
+    setState(() {});
   }
 }
 
