@@ -112,11 +112,6 @@ class NetConnector extends IService {
     }
   }
 
-  Future<Map> loadLists() async {
-    var result = await rpc("content_categories", params: {"editMode": true});
-    return result;
-  }
-
   Future<ParentContent> loadGroup(String id, Map data) async {
     final result = await rpc<List<dynamic>>(
       "content_contents",

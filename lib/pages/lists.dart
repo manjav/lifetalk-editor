@@ -24,9 +24,13 @@ class _ListsPageState extends State<ListsPage> {
   }
 
   Future<void> _loadLists() async {
-    var listMap = await serviceLocator<NetConnector>().loadLists();
+    var listMap = await serviceLocator<NetConnector>().rpc(
+      "content_categories",
+      params: {"editMode": true},
+    );
+    _lists.clear();
+    _updatedLessons.clear();
     var contents = Content.createLists(listMap);
-    _updatedLessons = <String, Fork>{};
     for (var list in listMap.entries) {
       for (var e in list.value["groups"].entries) {
         if (!e.value.containsKey("children")) continue;
@@ -124,7 +128,7 @@ class _ListsPageState extends State<ListsPage> {
       child: Row(
         spacing: 16,
         children: [
-          Text(lesson.values["id"]),
+          Text(lesson.id),
           Text(lessonTitle),
           Text(lessonSubtitle, style: TextStyle(color: Colors.grey)),
         ],
