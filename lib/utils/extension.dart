@@ -6,9 +6,13 @@ import 'package:intl/intl.dart' as intl;
 import 'package:intl/intl.dart' show DateFormat, NumberFormat;
 
 extension DoubleeExtension on double {
-  String toTime([String newPattern = "H:m:s.SS", String? locale]) {
+  String toTime({
+    String newPattern = "H:m:s.SS",
+    String? locale,
+    double leverage = 1000,
+  }) {
     var date = DateTime.utc(0, 1, 1, 0, 0, 0, 0, 0);
-    date = date.add(Duration(milliseconds: (this * 1000).round()));
+    date = date.add(Duration(milliseconds: (this * leverage).round()));
     var pattern = DateFormat(newPattern).format(date);
     if (pattern.startsWith("0:")) {
       pattern = pattern.substring(2, pattern.length - 1);
