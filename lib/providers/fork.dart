@@ -78,6 +78,12 @@ class Fork {
         }
       }
     }
+
+    if (level == ForkLevel.lesson) {
+      if (json.containsKey("index")) {
+        json["index"] = index;
+      }
+    }
     return json;
   }
 
@@ -155,6 +161,7 @@ enum ForkLevel {
       },
       ForkLevel.lesson => {
         "id": String,
+        "index": int,
         "mode": LessonMode,
         "titles": Map,
         "subtitles": Map,

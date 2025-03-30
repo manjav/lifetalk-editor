@@ -54,9 +54,17 @@ class _InspectorViewState extends State<InspectorView> {
         TextField(
           textDirection: text.getDirection(),
           controller: TextEditingController(text: text),
-          onSubmitted: (text) {
-            fork.values[key] = text;
-          },
+          onSubmitted: (text) => fork.values[key] = text,
+        ),
+      );
+    }
+    if (type == int) {
+      int value = fork.values[key] ?? 0;
+      return _rowCreator(
+        key,
+        TextField(
+          controller: TextEditingController(text: value.toString()),
+          onSubmitted: (text) => fork.values[key] = int.parse(text),
         ),
       );
     }
